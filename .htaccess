@@ -1,0 +1,64 @@
+# ミチシルベ2026 - パフォーマンス最適化設定
+
+# Gzip圧縮
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/html
+    AddOutputFilterByType DEFLATE text/css
+    AddOutputFilterByType DEFLATE text/javascript
+    AddOutputFilterByType DEFLATE application/javascript
+    AddOutputFilterByType DEFLATE application/json
+    AddOutputFilterByType DEFLATE image/svg+xml
+</IfModule>
+
+# ブラウザキャッシュ設定
+<IfModule mod_expires.c>
+    ExpiresActive On
+
+    # 画像: 1ヶ月
+    ExpiresByType image/jpeg "access plus 1 month"
+    ExpiresByType image/png "access plus 1 month"
+    ExpiresByType image/webp "access plus 1 month"
+    ExpiresByType image/svg+xml "access plus 1 month"
+    ExpiresByType image/x-icon "access plus 1 year"
+
+    # CSS/JavaScript: 1週間
+    ExpiresByType text/css "access plus 1 week"
+    ExpiresByType application/javascript "access plus 1 week"
+    ExpiresByType text/javascript "access plus 1 week"
+
+    # JSON: 1時間
+    ExpiresByType application/json "access plus 1 hour"
+
+    # HTML: 1時間
+    ExpiresByType text/html "access plus 1 hour"
+
+    # フォント: 1年
+    ExpiresByType font/woff2 "access plus 1 year"
+    ExpiresByType font/woff "access plus 1 year"
+    ExpiresByType application/font-woff "access plus 1 year"
+    ExpiresByType application/font-woff2 "access plus 1 year"
+</IfModule>
+
+# Cache-Controlヘッダー
+<IfModule mod_headers.c>
+    # 画像
+    <FilesMatch "\.(jpg|jpeg|png|webp|svg)$">
+        Header set Cache-Control "public, max-age=2592000"
+    </FilesMatch>
+
+    # CSS/JS
+    <FilesMatch "\.(css|js)$">
+        Header set Cache-Control "public, max-age=604800"
+    </FilesMatch>
+
+    # JSON
+    <FilesMatch "\.json$">
+        Header set Cache-Control "public, max-age=3600"
+    </FilesMatch>
+</IfModule>
+
+# ETags無効化（Cache-Controlを使用するため）
+<IfModule mod_headers.c>
+    Header unset ETag
+</IfModule>
+FileETag None

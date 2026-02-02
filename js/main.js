@@ -321,7 +321,7 @@ function renderTabSession(session, basePath) {
 
               return `
                 <a href="${basePath}speakers.html#${encodeURIComponent(speaker.name)}" class="speaker-item">
-                  <img src="${photoSrc}" alt="${escapeHtml(speaker.name)}" onerror="this.src='${basePath}images/speakers/default.svg'">
+                  <img src="${photoSrc}" alt="${escapeHtml(speaker.name)}" loading="lazy" onerror="this.src='${basePath}images/speakers/default.svg'">
                   <div class="speaker-item-info">
                     <h5>${escapeHtml(speaker.name)}</h5>
                     ${affiliation ? `<p class="affiliation">${escapeHtml(affiliation)}</p>` : ''}
@@ -484,7 +484,7 @@ function createSessionCard(session) {
             const photoSrc = speakerData ? `${basePath}${speakerData.photo}` : `${basePath}images/speakers/default.svg`;
             return `
               <a href="${basePath}speakers.html#${encodeURIComponent(speaker.name)}" class="speaker-tag">
-                <img src="${photoSrc}" alt="${escapeHtml(speaker.name)}" onerror="this.src='${basePath}images/speakers/default.svg'">
+                <img src="${photoSrc}" alt="${escapeHtml(speaker.name)}" loading="lazy" onerror="this.src='${basePath}images/speakers/default.svg'">
                 ${escapeHtml(speaker.name)}
               </a>
             `;
@@ -654,7 +654,7 @@ function renderSpeakers(speakers) {
   DOM.speakersGrid.innerHTML = speakers.map(speaker => `
     <article class="speaker-card" data-speaker-name="${escapeHtml(speaker.name)}" data-speaker-id="${speaker.id}">
       <div class="speaker-clickable">
-        <img class="speaker-photo" src="${basePath}${speaker.photo}" alt="${escapeHtml(speaker.name)}" onerror="this.src='${basePath}images/speakers/default.svg'">
+        <img class="speaker-photo" src="${basePath}${speaker.photo}" alt="${escapeHtml(speaker.name)}" loading="lazy" onerror="this.src='${basePath}images/speakers/default.svg'">
         <div class="speaker-info">
           <h3>${escapeHtml(speaker.name)}</h3>
           <p class="speaker-kana">${escapeHtml(speaker.nameKana || '')}</p>
@@ -761,7 +761,7 @@ function renderVenueSessions(sessions) {
               const photoSrc = speakerData ? `${basePath}${speakerData.photo}` : `${basePath}images/speakers/default.svg`;
               return `
                 <a href="${basePath}speakers.html#${encodeURIComponent(speaker.name)}" class="venue-speaker">
-                  <img src="${photoSrc}" alt="${escapeHtml(speaker.name)}" onerror="this.src='${basePath}images/speakers/default.svg'">
+                  <img src="${photoSrc}" alt="${escapeHtml(speaker.name)}" loading="lazy" onerror="this.src='${basePath}images/speakers/default.svg'">
                   <div class="venue-speaker-info">
                     <h4>${escapeHtml(speaker.name)}</h4>
                     <p>${escapeHtml(speaker.nameKana || '')}</p>
@@ -812,7 +812,7 @@ function showSessionModal(session) {
                 const photoSrc = speakerData ? `${basePath}${speakerData.photo}` : `${basePath}images/speakers/default.svg`;
                 return `
                   <a href="${basePath}speakers.html#${encodeURIComponent(speaker.name)}" class="venue-speaker">
-                    <img src="${photoSrc}" alt="${escapeHtml(speaker.name)}" onerror="this.src='${basePath}images/speakers/default.svg'">
+                    <img src="${photoSrc}" alt="${escapeHtml(speaker.name)}" loading="lazy" onerror="this.src='${basePath}images/speakers/default.svg'">
                     <div class="venue-speaker-info">
                       <h4>${escapeHtml(speaker.name)}</h4>
                       <p>${escapeHtml(speaker.nameKana || '')}</p>
