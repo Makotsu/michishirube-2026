@@ -18,12 +18,53 @@ const DOM = {};
  * 初期化
  */
 document.addEventListener('DOMContentLoaded', async () => {
+  initializeFontSizeControls();
   await loadData();
   initializeNavigation();
   initializeBackToTop();
   initializeScrollAnimations();
   initializePage();
 });
+
+/**
+ * フォントサイズ切り替え機能の初期化
+ */
+function initializeFontSizeControls() {
+  // 保存された設定を適用
+  const savedSize = localStorage.getItem('michishirube-font-size') || 'medium';
+  setFontSize(savedSize);
+
+  // ボタンにイベントリスナーを追加
+  document.querySelectorAll('.font-size-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const size = btn.dataset.size;
+      setFontSize(size);
+      localStorage.setItem('michishirube-font-size', size);
+    });
+  });
+}
+
+/**
+ * フォントサイズを設定
+ */
+function setFontSize(size) {
+  const html = document.documentElement;
+
+  // 既存のフォントサイズクラスを削除
+  html.classList.remove('font-size-small', 'font-size-medium', 'font-size-large');
+
+  // 新しいクラスを追加
+  html.classList.add(`font-size-${size}`);
+
+  // すべてのボタンのアクティブ状態を更新
+  document.querySelectorAll('.font-size-btn').forEach(btn => {
+    if (btn.dataset.size === size) {
+      btn.classList.add('active');
+    } else {
+      btn.classList.remove('active');
+    }
+  });
+}
 
 /**
  * JSONデータを読み込む
