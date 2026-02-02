@@ -324,7 +324,6 @@ function renderTabSession(session, basePath) {
                   <img src="${photoSrc}" alt="${escapeHtml(speaker.name)}" onerror="this.src='${basePath}images/speakers/default.svg'">
                   <div class="speaker-item-info">
                     <h5>${escapeHtml(speaker.name)}</h5>
-                    <p>${escapeHtml(speaker.nameKana || '')}</p>
                     ${affiliation ? `<p class="affiliation">${escapeHtml(affiliation)}</p>` : ''}
                   </div>
                 </a>

@@ -766,6 +766,11 @@ h6 { font-size: var(--text-base); }
   font-size: var(--text-sm);
   color: var(--color-text-sub);
   line-height: 1.6;
+  min-height: calc(var(--text-sm) * 1.6 * 3); /* 3行分の高さを確保 */
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .speaker-sessions {
@@ -1222,9 +1227,15 @@ h6 { font-size: var(--text-base); }
   color: var(--color-text-sub);
   margin-top: 0.25rem;
   line-height: 1.4;
-  white-space: nowrap;
+  min-height: calc(var(--text-xs) * 1.4 * 3); /* 3行分の高さを確保 */
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
   overflow: hidden;
-  text-overflow: ellipsis;
+}
+
+.speaker-item a {
+  text-decoration: none; /* 登壇者カード内は下線なし */
 }
 
 /* ========================================
