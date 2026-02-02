@@ -517,7 +517,7 @@ function renderTimetable() {
           </td>
         `;
       } else {
-        return `<td data-venue="${venue.id}"><div class="timetable-empty">余白の時間</div></td>`;
+        return `<td data-venue="${venue.id}"><div class="timetable-empty"></div></td>`;
       }
     }).join('');
 
@@ -623,7 +623,7 @@ function renderSpeakers(speakers) {
         <div class="speaker-sessions">
           ${(speaker.sessions || []).map(sessionId => {
             const session = appData.sessions.find(s => s.id === sessionId);
-            return session ? `<a href="${basePath}index.html#${sessionId}" class="session-tag">${sessionId}</a>` : '';
+            return session ? `<a href="${basePath}index.html#${sessionId}" class="session-tag">${session.venueCode}</a>` : '';
           }).join('')}
         </div>
       </div>
@@ -820,7 +820,7 @@ function showSpeakerModal(speaker) {
               <div class="speaker-sessions">
                 ${speaker.sessions.map(sessionId => {
                   const session = appData.sessions.find(s => s.id === sessionId);
-                  return session ? `<a href="${basePath}index.html#${sessionId}" class="session-tag">${sessionId}: ${escapeHtml(session.title)}</a>` : '';
+                  return session ? `<a href="${basePath}index.html#${sessionId}" class="session-tag">${session.venueCode}: ${escapeHtml(session.title)}</a>` : '';
                 }).join('')}
               </div>
             </div>
