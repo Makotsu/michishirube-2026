@@ -1903,6 +1903,13 @@ select:focus-visible {
   font-weight: 500;
 }
 
+/* タイムテーブルページ専用 - PC時はコンテナ幅を広げる */
+@media (min-width: 1024px) {
+  [data-page="timetable"] main .container {
+    max-width: 1600px;
+  }
+}
+
 /* ========================================
    Loading Animation
 ======================================== */
