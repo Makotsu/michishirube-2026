@@ -200,15 +200,16 @@ h6 { font-size: var(--text-base); }
   position: sticky;
   top: 0;
   z-index: 1000;
-  height: var(--header-height);
+  min-height: var(--header-height);
   border-bottom: 1px solid var(--color-border);
+  padding: var(--space-xs) 0;
 }
 
 .header-inner {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  height: 100%;
+  min-height: calc(var(--header-height) - var(--space-s));
 }
 
 .logo {
@@ -1907,6 +1908,107 @@ select:focus-visible {
 @media (min-width: 1024px) {
   [data-page="timetable"] main .container {
     max-width: 1600px;
+  }
+}
+
+/* ========================================
+   Font Size Switcher - フォントサイズ切り替え
+======================================== */
+html.font-size-small {
+  font-size: 16px;
+}
+
+html.font-size-medium {
+  font-size: 18px; /* デフォルト */
+}
+
+html.font-size-large {
+  font-size: 20px;
+}
+
+@media (max-width: 767px) {
+  html.font-size-small {
+    font-size: 15px;
+  }
+
+  html.font-size-medium {
+    font-size: 17px;
+  }
+
+  html.font-size-large {
+    font-size: 19px;
+  }
+}
+
+.font-size-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  margin-left: var(--space-s);
+  padding-left: var(--space-s);
+  border-left: 1px solid var(--color-border);
+}
+
+/* デスクトップではmobileクラスのコントロールを非表示 */
+.font-size-controls.mobile {
+  display: none;
+}
+
+.font-size-controls span {
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+  margin-right: 0.25rem;
+}
+
+.font-size-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: 1px solid var(--color-border);
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-body);
+  cursor: pointer;
+  transition: var(--ease-fast);
+  font-weight: 400;
+}
+
+.font-size-btn:hover {
+  border-color: var(--color-text);
+}
+
+.font-size-btn.active {
+  background-color: #141413;
+  color: #ffffff;
+  border-color: #141413;
+}
+
+.font-size-btn[data-size="small"] {
+  font-size: 12px;
+}
+
+.font-size-btn[data-size="medium"] {
+  font-size: 14px;
+}
+
+.font-size-btn[data-size="large"] {
+  font-size: 16px;
+}
+
+@media (max-width: 767px) {
+  .font-size-controls {
+    display: none;
+  }
+
+  .font-size-controls.mobile {
+    display: flex;
+    justify-content: center;
+    margin: 0;
+    padding: var(--space-s) 0;
+    border-left: none;
+    border-top: 1px solid var(--color-border);
   }
 }
 
