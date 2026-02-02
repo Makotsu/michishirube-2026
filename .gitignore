@@ -1,0 +1,16 @@
+# macOS
+.DS_Store
+
+# Temporary files (Office lock files)
+~$*
+
+# Claude cache
+.claude/
+
+# Large files
+*.pdf
+*.docx
+*.xlsx
+
+# Profile photos folder
+⑤プロフィール写真*/
