@@ -176,6 +176,45 @@ function initializeSessionsPage() {
   if (DOM.searchInput) {
     DOM.searchInput.addEventListener('input', debounce(filterTabSessions, 300));
   }
+
+  // URLハッシュがあれば該当するセッションにスクロール
+  if (window.location.hash) {
+    const sessionId = decodeURIComponent(window.location.hash.substring(1));
+    setTimeout(() => {
+      scrollToSession(sessionId);
+    }, 100);
+  }
+}
+
+/**
+ * 指定されたセッションIDのセッションにスクロール
+ */
+function scrollToSession(sessionId) {
+  const session = appData.sessions.find(s => s.id === sessionId);
+  if (!session) return;
+
+  // 該当セッションの会場タブをアクティブにする
+  const venueId = session.venue;
+  const tab = DOM.venueTabs.querySelector(`.venue-tab[data-venue="${venueId}"]`);
+  if (tab) {
+    // タブのアクティブ状態を更新
+    DOM.venueTabs.querySelectorAll('.venue-tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+
+    // コンテンツのアクティブ状態を更新
+    DOM.tabContents.querySelectorAll('.venue-tab-content').forEach(c => c.classList.remove('active'));
+    const content = DOM.tabContents.querySelector(`.venue-tab-content[data-venue="${venueId}"]`);
+    if (content) content.classList.add('active');
+  }
+
+  // 該当セッションにスクロール
+  setTimeout(() => {
+    const sessionElement = document.querySelector(`.tab-session-item[data-session-id="${sessionId}"]`);
+    if (sessionElement) {
+      sessionElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      sessionElement.classList.add('highlight');
+    }
+  }, 100);
 }
 
 /**
