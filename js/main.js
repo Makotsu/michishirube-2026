@@ -653,21 +653,33 @@ function renderSpeakers(speakers) {
   const basePath = getBasePath();
 
   DOM.speakersGrid.innerHTML = speakers.map(speaker => `
-    <article class="speaker-card" data-speaker-name="${escapeHtml(speaker.name)}">
-      <img class="speaker-photo" src="${basePath}${speaker.photo}" alt="${escapeHtml(speaker.name)}" onerror="this.src='${basePath}images/speakers/default.svg'">
-      <div class="speaker-info">
-        <h3><a href="#" onclick="showSpeakerModal(appData.speakers.find(s => s.id === '${speaker.id}')); return false;">${escapeHtml(speaker.name)}</a></h3>
-        <p class="speaker-kana">${escapeHtml(speaker.nameKana || '')}</p>
-        <p class="speaker-affiliation">${escapeHtml(speaker.affiliation || '')}</p>
-        <div class="speaker-sessions">
-          ${(speaker.sessions || []).map(sessionId => {
-            const session = appData.sessions.find(s => s.id === sessionId);
-            return session ? `<a href="${basePath}index.html#${sessionId}" class="session-tag">${session.venueCode}</a>` : '';
-          }).join('')}
+    <article class="speaker-card" data-speaker-name="${escapeHtml(speaker.name)}" data-speaker-id="${speaker.id}">
+      <div class="speaker-clickable">
+        <img class="speaker-photo" src="${basePath}${speaker.photo}" alt="${escapeHtml(speaker.name)}" onerror="this.src='${basePath}images/speakers/default.svg'">
+        <div class="speaker-info">
+          <h3>${escapeHtml(speaker.name)}</h3>
+          <p class="speaker-kana">${escapeHtml(speaker.nameKana || '')}</p>
+          <p class="speaker-affiliation">${escapeHtml(speaker.affiliation || '')}</p>
         </div>
+      </div>
+      <div class="speaker-sessions">
+        ${(speaker.sessions || []).map(sessionId => {
+          const session = appData.sessions.find(s => s.id === sessionId);
+          return session ? `<a href="${basePath}index.html#${sessionId}" class="session-tag">${session.venueCode}</a>` : '';
+        }).join('')}
       </div>
     </article>
   `).join('');
+
+  // カードのクリックイベントを追加
+  DOM.speakersGrid.querySelectorAll('.speaker-clickable').forEach(clickable => {
+    clickable.addEventListener('click', () => {
+      const card = clickable.closest('.speaker-card');
+      const speakerId = card.dataset.speakerId;
+      const speaker = appData.speakers.find(s => s.id === speakerId);
+      if (speaker) showSpeakerModal(speaker);
+    });
+  });
 }
 
 /* ========================================

@@ -708,6 +708,15 @@ h6 { font-size: var(--text-base); }
   box-shadow: var(--shadow-m);
 }
 
+.speaker-clickable {
+  cursor: pointer;
+  transition: var(--ease-default);
+}
+
+.speaker-clickable:hover {
+  opacity: 0.8;
+}
+
 .tab-session-item.highlight {
   border-color: var(--color-text);
   box-shadow: var(--shadow-m);
@@ -756,7 +765,6 @@ h6 { font-size: var(--text-base); }
 .speaker-affiliation {
   font-size: var(--text-sm);
   color: var(--color-text-sub);
-  margin-bottom: var(--space-s);
   line-height: 1.6;
 }
 
@@ -765,6 +773,10 @@ h6 { font-size: var(--text-base); }
   flex-wrap: wrap;
   justify-content: center;
   gap: 0.375rem;
+  padding: 0 var(--space-m) var(--space-m);
+  border-top: 1px solid var(--color-border);
+  margin-top: var(--space-s);
+  padding-top: var(--space-s);
 }
 
 .session-tag {
