@@ -124,19 +124,19 @@
         },
         {
           "name": "岡野みゆき",
-          "nameKana": "労福協"
+          "nameKana": ""
         },
         {
           "name": "山口聖子",
-          "nameKana": "グラミン"
+          "nameKana": ""
         }
       ]
     },
     {
-      "id": "BL\n",
+      "id": "BL",
       "venue": "B",
       "venueCode": "芽L",
-      "timeSlot": "L\n",
+      "timeSlot": "L",
       "title": "自分も相手も抱きしめる「いのち」の対話 〜自分の中にある「光のタネ」に気づき育むための最初の30分〜",
       "description": "行政の最前線で長年、こころの声に耳を傾け続けてきた清水喜子。彼女が大切にしているのは、対話を通じて、誰の中にもある「光のタネ（生まれ持った優しさや思いやり＝愛）」に自分自身で気づくきっかけを創ること。   本セッションでは、「本当の願い」や「こころの声」に気づき、どんな自分も愛し、抱きしめることの尊さを分かち合います。  忙しい日々の中で、私たちは自分の心を置き去りにしていないでしょうか。一人ひとりが自分自身を大切にすることが、世界に調和をもたらす一歩になる。  清水さんの温かな言葉を通して、自分自身と向き合う30分の穏やかな時間をお届けします。",
       "speakers": [
@@ -186,15 +186,15 @@
         },
         {
           "name": "宜保健",
-          "nameKana": "読谷村健康推進課長"
+          "nameKana": ""
         },
         {
           "name": "波平美和子",
-          "nameKana": "一般社団法人レアーズ代表理事"
+          "nameKana": ""
         },
         {
           "name": "兼島篤貴",
-          "nameKana": "沖縄県産業政策課総務班長"
+          "nameKana": ""
         }
       ]
     },
@@ -208,19 +208,19 @@
       "speakers": [
         {
           "name": "小渡寛子",
-          "nameKana": "彗（sui）：中高生に無料で服を届ける「０円マーケット」"
+          "nameKana": ""
         },
         {
           "name": "長堂雄一",
-          "nameKana": "RYUKYU30：現役琉球大学医学部学生が運営する無料塾"
+          "nameKana": ""
         },
         {
           "name": "宮里桃花",
-          "nameKana": "Ladybird：「生理の貧困」に取り組む学生サークル（沖縄キリスト教学院大学）"
+          "nameKana": ""
         },
         {
           "name": "松村葉子",
-          "nameKana": "子どもの居場所ボランティアセンター コーディネーター"
+          "nameKana": ""
         }
       ]
     },
@@ -238,19 +238,19 @@
         },
         {
           "name": "森根絹代",
-          "nameKana": "HelloWorld／児童養護施設の当事者"
+          "nameKana": ""
         },
         {
           "name": "上原優愛",
-          "nameKana": "島添の丘入所/鬼鷲活動歴7年"
+          "nameKana": ""
         },
         {
           "name": "伊保浩美",
-          "nameKana": "島添の丘職員"
+          "nameKana": ""
         },
         {
           "name": "平川茉美蛙",
-          "nameKana": "児童養護施設なごみ入所/沖縄文化活用型感動体験ワークショップ参加者"
+          "nameKana": ""
         }
       ]
     },
@@ -886,7 +886,7 @@
       "speakers": [
         {
           "name": "山田 照子",
-          "nameKana": "Office teru sun 代表／「テルさんの出前授業」講師"
+          "nameKana": ""
         }
       ]
     }
@@ -1037,7 +1037,7 @@
     },
     {
       "name": "岡野みゆき",
-      "nameKana": "労福協",
+      "nameKana": "",
       "sessions": [
         "B2"
       ],
@@ -1066,7 +1066,7 @@
       "bio": "大阪市職員として、保健福祉、多文化共生、地域防災、子育て支援、児童虐待、DV、クレーム対応、人事、人材育成など、暮らしと人を支える現場に携わってきた。「最後のセーフティネットである役所にこそ愛が必要」との想いから、共感と感謝、対話を軸に人材育成と組織風土改革を実践。24区中最下位評価だった区役所は、翌年、職員全員の力により一位となる。\n退職後は、いのちの授業や対話型イベント、グリーフケア、人が輝く組織づくりに携わる。その人自身の力で進んでいけるよう、尊厳を大切に守る関わりを通して、他者とつながり直す社会を、祈りとともに育んでいる。",
       "sns": "ゆたかはなHP  https://sites.google.com/view/nobuko-shimizu　　facebook https://www.facebook.com/share/1ErqV68Yna/?mibextid=wwXIfr",
       "id": "speaker_016",
-      "photo": "images/speakers/default.svg"
+      "photo": "images/speakers/speaker_016.jpg"
     },
     {
       "name": "中村圭一郎",
@@ -1127,7 +1127,7 @@
     },
     {
       "name": "宜保健",
-      "nameKana": "読谷村健康推進課長",
+      "nameKana": "",
       "sessions": [
         "C1"
       ],
@@ -1136,7 +1136,7 @@
     },
     {
       "name": "波平美和子",
-      "nameKana": "一般社団法人レアーズ代表理事",
+      "nameKana": "",
       "sessions": [
         "C1"
       ],
@@ -1145,16 +1145,16 @@
     },
     {
       "name": "兼島篤貴",
-      "nameKana": "沖縄県産業政策課総務班長",
+      "nameKana": "",
       "sessions": [
         "C1"
       ],
       "id": "speaker_024",
-      "photo": "images/speakers/default.svg"
+      "photo": "images/speakers/speaker_024.jpg"
     },
     {
       "name": "小渡寛子",
-      "nameKana": "彗（sui）：中高生に無料で服を届ける「０円マーケット」",
+      "nameKana": "",
       "sessions": [
         "C2"
       ],
@@ -1163,7 +1163,7 @@
     },
     {
       "name": "長堂雄一",
-      "nameKana": "RYUKYU30：現役琉球大学医学部学生が運営する無料塾",
+      "nameKana": "",
       "sessions": [
         "C2"
       ],
@@ -1172,7 +1172,7 @@
     },
     {
       "name": "宮里桃花",
-      "nameKana": "Ladybird：「生理の貧困」に取り組む学生サークル（沖縄キリスト教学院大学）",
+      "nameKana": "",
       "sessions": [
         "C2"
       ],
@@ -1181,7 +1181,7 @@
     },
     {
       "name": "松村葉子",
-      "nameKana": "子どもの居場所ボランティアセンター コーディネーター",
+      "nameKana": "",
       "sessions": [
         "C2"
       ],
@@ -1199,7 +1199,7 @@
     },
     {
       "name": "森根絹代",
-      "nameKana": "HelloWorld／児童養護施設の当事者",
+      "nameKana": "",
       "sessions": [
         "C3"
       ],
@@ -1208,7 +1208,7 @@
     },
     {
       "name": "上原優愛",
-      "nameKana": "島添の丘入所/鬼鷲活動歴7年",
+      "nameKana": "",
       "sessions": [
         "C3"
       ],
@@ -1217,7 +1217,7 @@
     },
     {
       "name": "伊保浩美",
-      "nameKana": "島添の丘職員",
+      "nameKana": "",
       "sessions": [
         "C3"
       ],
@@ -1226,7 +1226,7 @@
     },
     {
       "name": "平川茉美蛙",
-      "nameKana": "児童養護施設なごみ入所/沖縄文化活用型感動体験ワークショップ参加者",
+      "nameKana": "",
       "sessions": [
         "C3"
       ],
@@ -1822,7 +1822,7 @@
       "bio": "石川県出身。経済産業省入省後、結婚を機に沖縄総合事務局に転勤したうちなー嫁。中小企業支援や新規産業創出に関わる。沖縄らしいアトツギ「つぎんちゅ」の活動を盛り上げている。",
       "sns": "",
       "id": "speaker_085",
-      "photo": "images/speakers/default.svg"
+      "photo": "images/speakers/speaker_085.png"
     },
     {
       "name": "田中邦裕",
@@ -1846,7 +1846,7 @@
       "bio": "岐阜県出身、横浜国立大学工学部卒。2012年にキーエンスに入社し、国内トップクラスの成績で受賞歴多数。2016年、日本M&Aセンターに入社し、年間新人賞を受賞。ファンドカバレッジ事業部の設立に貢献。2019年にはM&Aコンサルティングを共同創業し、代表取締役に就任。2023年にスピカコンサルティングに参画。",
       "sns": "Facebook https://www.facebook.com/share/14WfPCPxr76/?mibextid=wwXIfr  　X @halu_halu_",
       "id": "speaker_087",
-      "photo": "images/speakers/default.svg"
+      "photo": "images/speakers/speaker_087.jpg"
     },
     {
       "name": "大岩健太郎",
@@ -2163,7 +2163,7 @@
       "sns": "https://bowl.co.jp/",
       "sessions": [],
       "id": "speaker_117",
-      "photo": "images/speakers/default.svg"
+      "photo": "images/speakers/speaker_117.jpg"
     },
     {
       "name": "仲本 いつ美",
@@ -2193,7 +2193,7 @@
       "sns": "https://www.eternityfoods.co.jp/",
       "sessions": [],
       "id": "speaker_120",
-      "photo": "images/speakers/default.svg"
+      "photo": "images/speakers/speaker_120.jpg"
     },
     {
       "name": "平田　大一",

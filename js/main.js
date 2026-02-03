@@ -31,7 +31,7 @@ document.addEventListener('DOMContentLoaded', async () => {
  */
 function initializeFontSizeControls() {
   // 保存された設定を適用
-  const savedSize = localStorage.getItem('michishirube-font-size') || 'medium';
+  const savedSize = localStorage.getItem(CONFIG.STORAGE_KEYS.FONT_SIZE) || CONFIG.DEFAULTS.FONT_SIZE;
   setFontSize(savedSize);
 
   // ボタンにイベントリスナーを追加
@@ -39,7 +39,7 @@ function initializeFontSizeControls() {
     btn.addEventListener('click', () => {
       const size = btn.dataset.size;
       setFontSize(size);
-      localStorage.setItem('michishirube-font-size', size);
+      localStorage.setItem(CONFIG.STORAGE_KEYS.FONT_SIZE, size);
     });
   });
 }
@@ -172,7 +172,22 @@ function initializeScrollAnimations() {
     });
   });
 
-  mutationObserver.observe(document.body, { childList: true, subtree: true });
+  // 特定のコンテナのみ監視（パフォーマンス最適化）
+  const dynamicContainers = [
+    document.getElementById('tab-contents'),
+    document.getElementById('speakers-grid'),
+    document.getElementById('venue-sessions'),
+    document.getElementById('timetable-body')
+  ].filter(Boolean);
+
+  if (dynamicContainers.length > 0) {
+    dynamicContainers.forEach(container => {
+      mutationObserver.observe(container, { childList: true, subtree: true });
+    });
+  } else {
+    // フォールバック: コンテナがまだない場合はbodyを監視
+    mutationObserver.observe(document.body, { childList: true, subtree: true });
+  }
 
   // 既存の要素を監視
   document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
@@ -295,8 +310,7 @@ function renderVenueTabs() {
     const venueSessions = appData.sessions
       .filter(s => s.venue === venue.id)
       .sort((a, b) => {
-        const order = ['1', '2', 'L', '3'];
-        return order.indexOf(a.timeSlot) - order.indexOf(b.timeSlot);
+        return CONFIG.TIME_SLOT_ORDER.indexOf(a.timeSlot) - CONFIG.TIME_SLOT_ORDER.indexOf(b.timeSlot);
       });
 
     return `
@@ -361,7 +375,7 @@ function renderTabSession(session, basePath) {
               const affiliation = speakerData?.affiliation || '';
 
               return `
-                <a href="${basePath}speakers.html#${encodeURIComponent(speaker.name)}" class="speaker-item">
+                <a href="javascript:void(0)" class="speaker-item" data-speaker-name="${escapeHtml(speaker.name)}">
                   <img src="${photoSrc}" alt="${escapeHtml(speaker.name)}" loading="lazy" onerror="this.src='${basePath}images/speakers/default.svg'">
                   <div class="speaker-item-info">
                     <h5>${escapeHtml(speaker.name)}</h5>
@@ -399,8 +413,7 @@ function filterTabSessions() {
             (sp.nameKana && sp.nameKana.toLowerCase().includes(searchTerm)));
       })
       .sort((a, b) => {
-        const order = ['1', '2', '3', 'L'];
-        return order.indexOf(a.timeSlot) - order.indexOf(b.timeSlot);
+        return CONFIG.TIME_SLOT_ORDER.indexOf(a.timeSlot) - CONFIG.TIME_SLOT_ORDER.indexOf(b.timeSlot);
       });
 
     const sessionsList = content.querySelector('.tab-sessions-list');
@@ -524,7 +537,7 @@ function createSessionCard(session) {
             );
             const photoSrc = speakerData ? `${basePath}${speakerData.photo}` : `${basePath}images/speakers/default.svg`;
             return `
-              <a href="${basePath}speakers.html#${encodeURIComponent(speaker.name)}" class="speaker-tag">
+              <a href="javascript:void(0)" class="speaker-tag" data-speaker-name="${escapeHtml(speaker.name)}">
                 <img src="${photoSrc}" alt="${escapeHtml(speaker.name)}" loading="lazy" onerror="this.src='${basePath}images/speakers/default.svg'">
                 ${escapeHtml(speaker.name)}
               </a>
@@ -575,8 +588,7 @@ function renderTimetable() {
 
   // 時間帯を正しい順序でソート
   const sortedTimeSlots = [...appData.timeSlots].sort((a, b) => {
-    const order = ['1', '2', 'L', '3'];
-    return order.indexOf(a.id) - order.indexOf(b.id);
+    return CONFIG.TIME_SLOT_ORDER.indexOf(a.id) - CONFIG.TIME_SLOT_ORDER.indexOf(b.id);
   });
 
   // 時間帯ごとの行を生成
@@ -589,7 +601,7 @@ function renderTimetable() {
       if (session) {
         return `
           <td data-venue="${venue.id}">
-            <div class="timetable-session" data-session-id="${session.id}" onclick="showSessionModal(appData.sessions.find(s => s.id === '${session.id}'))">
+            <div class="timetable-session" data-session-id="${session.id}">
               <h4>${escapeHtml(session.title)}</h4>
               <div class="speakers">${session.speakers.map(s => s.name).join('、')}</div>
             </div>
@@ -639,10 +651,22 @@ function initializeSpeakersPage() {
 
   if (!DOM.speakersGrid) return;
 
-  // 登壇者を五十音順でソート
+  // 登壇者を「情報記載あり」→「情報記載なし」の順で、それぞれあいうえお順にソート
   const sortedSpeakers = [...appData.speakers].sort((a, b) => {
-    const kanaA = a.nameKana || '';
-    const kanaB = b.nameKana || '';
+    // 情報記載ありの判定（写真がdefault.svg以外、またはbioが入力されている）
+    const hasInfoA = (a.photo && !a.photo.includes('default.svg')) || (a.bio && a.bio.trim() !== '');
+    const hasInfoB = (b.photo && !b.photo.includes('default.svg')) || (b.bio && b.bio.trim() !== '');
+
+    // 情報記載ありを先に表示
+    if (hasInfoA && !hasInfoB) return -1;
+    if (!hasInfoA && hasInfoB) return 1;
+
+    // 同じグループ内であいうえお順（nameKanaが空の場合は後ろに回す）
+    const kanaA = a.nameKana ? a.nameKana.trim() : '';
+    const kanaB = b.nameKana ? b.nameKana.trim() : '';
+    if (kanaA && !kanaB) return -1;
+    if (!kanaA && kanaB) return 1;
+    if (!kanaA && !kanaB) return 0;
     return kanaA.localeCompare(kanaB, 'ja');
   });
 
@@ -737,8 +761,7 @@ function initializeVenuePage() {
     .filter(s => s.venue === venueId)
     .sort((a, b) => {
       // 時間帯順にソート（1 → 2 → L → 3）
-      const order = ['1', '2', 'L', '3'];
-      return order.indexOf(a.timeSlot) - order.indexOf(b.timeSlot);
+      return CONFIG.TIME_SLOT_ORDER.indexOf(a.timeSlot) - CONFIG.TIME_SLOT_ORDER.indexOf(b.timeSlot);
     });
 
   // 会場情報を更新
@@ -801,7 +824,7 @@ function renderVenueSessions(sessions) {
               );
               const photoSrc = speakerData ? `${basePath}${speakerData.photo}` : `${basePath}images/speakers/default.svg`;
               return `
-                <a href="${basePath}speakers.html#${encodeURIComponent(speaker.name)}" class="venue-speaker">
+                <a href="javascript:void(0)" class="venue-speaker" data-speaker-name="${escapeHtml(speaker.name)}">
                   <img src="${photoSrc}" alt="${escapeHtml(speaker.name)}" loading="lazy" onerror="this.src='${basePath}images/speakers/default.svg'">
                   <div class="venue-speaker-info">
                     <h4>${escapeHtml(speaker.name)}</h4>
@@ -828,11 +851,11 @@ function showSessionModal(session) {
   const venue = appData.venues.find(v => v.id === session.venue);
 
   const modalHtml = `
-    <div class="modal-overlay active" onclick="closeModal(event)">
-      <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-overlay active" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+      <div class="modal" role="document">
         <div class="modal-header">
-          <h2>${escapeHtml(session.title)}</h2>
-          <button class="modal-close" onclick="closeModal()">&times;</button>
+          <h2 id="modal-title">${escapeHtml(session.title)}</h2>
+          <button class="modal-close" aria-label="閉じる" type="button">&times;</button>
         </div>
         <div class="modal-body">
           <div class="modal-section">
@@ -850,10 +873,10 @@ function showSessionModal(session) {
                 const speakerData = appData.speakers.find(s =>
                   s.name.replace(/\s/g, '') === speaker.name.replace(/\s/g, '')
                 );
-                const photoSrc = speakerData ? `${basePath}${speakerData.photo}` : `${basePath}images/speakers/default.svg`;
+                const photoSrc = speakerData ? `${basePath}${speakerData.photo}` : `${basePath}${CONFIG.DEFAULTS.SPEAKER_PHOTO}`;
                 return `
-                  <a href="${basePath}speakers.html#${encodeURIComponent(speaker.name)}" class="venue-speaker">
-                    <img src="${photoSrc}" alt="${escapeHtml(speaker.name)}" loading="lazy" onerror="this.src='${basePath}images/speakers/default.svg'">
+                  <a href="javascript:void(0)" class="venue-speaker" data-speaker-name="${escapeHtml(speaker.name)}" data-close-modal="true">
+                    <img src="${photoSrc}" alt="${escapeHtml(speaker.name)}" loading="lazy" onerror="this.src='${basePath}${CONFIG.DEFAULTS.SPEAKER_PHOTO}'">
                     <div class="venue-speaker-info">
                       <h4>${escapeHtml(speaker.name)}</h4>
                       <p>${escapeHtml(speaker.nameKana || '')}</p>
@@ -868,8 +891,7 @@ function showSessionModal(session) {
     </div>
   `;
 
-  document.body.insertAdjacentHTML('beforeend', modalHtml);
-  document.body.style.overflow = 'hidden';
+  Modal.open(modalHtml);
 }
 
 function showSpeakerModal(speaker) {
@@ -878,17 +900,17 @@ function showSpeakerModal(speaker) {
   const basePath = getBasePath();
 
   const modalHtml = `
-    <div class="modal-overlay active" onclick="closeModal(event)">
-      <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-overlay active" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+      <div class="modal" role="document">
         <div class="modal-header">
-          <h2>${escapeHtml(speaker.name)}</h2>
-          <button class="modal-close" onclick="closeModal()">&times;</button>
+          <h2 id="modal-title">${escapeHtml(speaker.name)}</h2>
+          <button class="modal-close" aria-label="閉じる" type="button">&times;</button>
         </div>
         <div class="modal-body">
           <div style="text-align: center; margin-bottom: 1rem;">
             <img src="${basePath}${speaker.photo}" alt="${escapeHtml(speaker.name)}"
                  style="width: 150px; height: 150px; border-radius: 50%; object-fit: cover;"
-                 onerror="this.src='${basePath}images/speakers/default.svg'">
+                 onerror="this.src='${basePath}${CONFIG.DEFAULTS.SPEAKER_PHOTO}'">
           </div>
           <p class="speaker-kana" style="text-align: center;">${escapeHtml(speaker.nameKana || '')}</p>
           <div class="modal-section">
@@ -921,23 +943,109 @@ function showSpeakerModal(speaker) {
     </div>
   `;
 
-  document.body.insertAdjacentHTML('beforeend', modalHtml);
-  document.body.style.overflow = 'hidden';
+  Modal.open(modalHtml);
 }
+
+// モーダル管理オブジェクト
+const Modal = {
+  previousFocus: null,
+
+  trapFocus(modalElement) {
+    const focusableElements = modalElement.querySelectorAll(
+      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+    );
+    if (focusableElements.length === 0) return;
+
+    const firstFocusable = focusableElements[0];
+    const lastFocusable = focusableElements[focusableElements.length - 1];
+
+    firstFocusable.focus();
+
+    modalElement.addEventListener('keydown', (e) => {
+      if (e.key !== 'Tab') return;
+
+      if (e.shiftKey) {
+        if (document.activeElement === firstFocusable) {
+          e.preventDefault();
+          lastFocusable.focus();
+        }
+      } else {
+        if (document.activeElement === lastFocusable) {
+          e.preventDefault();
+          firstFocusable.focus();
+        }
+      }
+    });
+  },
+
+  open(modalHtml) {
+    this.previousFocus = document.activeElement;
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+    document.body.style.overflow = 'hidden';
+
+    const modal = document.querySelector('.modal-overlay');
+    if (modal) {
+      this.trapFocus(modal);
+    }
+  },
+
+  close() {
+    const modal = document.querySelector('.modal-overlay');
+    if (modal) {
+      modal.remove();
+      document.body.style.overflow = '';
+      if (this.previousFocus) {
+        this.previousFocus.focus();
+      }
+    }
+  }
+};
 
 function closeModal(event) {
   if (event && event.target !== event.currentTarget) return;
-
-  const modal = document.querySelector('.modal-overlay');
-  if (modal) {
-    modal.remove();
-    document.body.style.overflow = '';
-  }
+  Modal.close();
 }
 
 // ESCキーでモーダルを閉じる
 document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape') closeModal();
+});
+
+// イベント委譲パターン
+document.body.addEventListener('click', (e) => {
+  // 登壇者モーダル表示
+  const speakerTrigger = e.target.closest('[data-speaker-name]');
+  if (speakerTrigger) {
+    e.preventDefault();
+    e.stopPropagation();
+    const shouldCloseFirst = speakerTrigger.dataset.closeModal === 'true';
+    if (shouldCloseFirst) {
+      Modal.close();
+    }
+    showSpeakerModalByName(speakerTrigger.dataset.speakerName);
+    return;
+  }
+
+  // セッションモーダル表示（タイムテーブル）
+  const sessionTrigger = e.target.closest('.timetable-session[data-session-id]');
+  if (sessionTrigger) {
+    const sessionId = sessionTrigger.dataset.sessionId;
+    const session = appData.sessions.find(s => s.id === sessionId);
+    if (session) showSessionModal(session);
+    return;
+  }
+
+  // モーダル閉じる（閉じるボタン）
+  if (e.target.closest('.modal-close')) {
+    closeModal();
+    return;
+  }
+
+  // モーダル閉じる（オーバーレイクリック）
+  if (e.target.classList.contains('modal-overlay')) {
+    closeModal();
+    return;
+  }
 });
 
 /* ========================================
@@ -970,8 +1078,36 @@ function showError(message) {
   document.body.insertBefore(errorDiv, document.body.firstChild);
 }
 
-// グローバルに公開する関数
+/**
+ * 登壇者名からモーダルを表示
+ */
+function showSpeakerModalByName(speakerName) {
+  const speaker = appData.speakers.find(s =>
+    s.name.replace(/\s/g, '') === speakerName.replace(/\s/g, '')
+  );
+  if (speaker) {
+    showSpeakerModal(speaker);
+  }
+}
+
+// 名前空間パターンでグローバルに公開
+const Michishirube = {
+  data: appData,
+  config: CONFIG,
+  utils: Utils,
+  modal: Modal,
+  api: {
+    showSessionModal: showSessionModal,
+    showSpeakerModal: showSpeakerModal,
+    showSpeakerModalByName: showSpeakerModalByName,
+    closeModal: closeModal
+  }
+};
+window.Michishirube = Michishirube;
+
+// 後方互換性のため個別関数もグローバルに公開
 window.showSessionModal = showSessionModal;
 window.showSpeakerModal = showSpeakerModal;
+window.showSpeakerModalByName = showSpeakerModalByName;
 window.closeModal = closeModal;
 window.appData = appData;
