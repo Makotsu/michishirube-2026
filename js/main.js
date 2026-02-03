@@ -638,7 +638,7 @@ function updateVenueNavigation() {
 
   const basePath = getBasePath();
   venueNav.innerHTML = appData.venues.map(venue => {
-    return `<a href="${basePath}venue/${venue.id.toLowerCase()}.html">${venue.nameJp || venue.id}（${venue.id}）</a>`;
+    return `<a href="${basePath}venue/${venue.id.toLowerCase()}">${venue.nameJp || venue.id}（${venue.id}）</a>`;
   }).join('');
 }
 
@@ -729,7 +729,7 @@ function renderSpeakers(speakers) {
       <div class="speaker-sessions">
         ${(speaker.sessions || []).map(sessionId => {
           const session = appData.sessions.find(s => s.id === sessionId);
-          return session ? `<a href="${basePath}index.html#${sessionId}" class="session-tag">${session.venueCode}</a>` : '';
+          return session ? `<a href="${basePath || './'}#${sessionId}" class="session-tag">${session.venueCode}</a>` : '';
         }).join('')}
       </div>
     </article>
@@ -933,7 +933,7 @@ function showSpeakerModal(speaker) {
               <div class="speaker-sessions">
                 ${speaker.sessions.map(sessionId => {
                   const session = appData.sessions.find(s => s.id === sessionId);
-                  return session ? `<a href="${basePath}index.html#${sessionId}" class="session-tag">${session.venueCode}: ${escapeHtml(session.title)}</a>` : '';
+                  return session ? `<a href="${basePath || './'}#${sessionId}" class="session-tag">${session.venueCode}: ${escapeHtml(session.title)}</a>` : '';
                 }).join('')}
               </div>
             </div>

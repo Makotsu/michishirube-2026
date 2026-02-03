@@ -1,5 +1,22 @@
 # ミチシルベ2026 - パフォーマンス最適化設定
 
+# URLから.htmlを省略（クリーンURL）
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # .htmlありでアクセスされた場合、.htmlなしにリダイレクト（301）
+    # index.htmlは除外
+    RewriteCond %{THE_REQUEST} \s/([^.]+)\.html[\s?] [NC]
+    RewriteCond %{REQUEST_URI} !^/index\.html$
+    RewriteRule ^ /%1 [R=301,L]
+
+    # .htmlなしでアクセスされた場合、対応する.htmlファイルを表示
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME}.html -f
+    RewriteRule ^(.*)$ $1.html [L]
+</IfModule>
+
 # Gzip圧縮
 <IfModule mod_deflate.c>
     AddOutputFilterByType DEFLATE text/html
