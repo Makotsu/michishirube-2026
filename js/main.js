@@ -912,7 +912,6 @@ function showSpeakerModal(speaker) {
                  style="width: 150px; height: 150px; border-radius: 50%; object-fit: cover;"
                  onerror="this.src='${basePath}${CONFIG.DEFAULTS.SPEAKER_PHOTO}'">
           </div>
-          <p class="speaker-kana" style="text-align: center;">${escapeHtml(speaker.nameKana || '')}</p>
           <div class="modal-section">
             <h4>所属・役職</h4>
             <p>${escapeHtml(speaker.affiliation || '未設定')}</p>
