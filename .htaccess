@@ -4,11 +4,14 @@
 <IfModule mod_rewrite.c>
     RewriteEngine On
 
+    # サブディレクトリ対応（必要に応じて変更）
+    # RewriteBase /
+
     # .htmlありでアクセスされた場合、.htmlなしにリダイレクト（301）
     # index.htmlは除外
-    RewriteCond %{THE_REQUEST} \s/([^.]+)\.html[\s?] [NC]
-    RewriteCond %{REQUEST_URI} !^/index\.html$
-    RewriteRule ^ /%1 [R=301,L]
+    RewriteCond %{THE_REQUEST} \s/+(.+?)\.html[\s?] [NC]
+    RewriteCond %{REQUEST_URI} !index\.html$
+    RewriteRule (.+)\.html$ $1 [R=301,L]
 
     # .htmlなしでアクセスされた場合、対応する.htmlファイルを表示
     RewriteCond %{REQUEST_FILENAME} !-d
