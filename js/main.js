@@ -638,7 +638,8 @@ function updateVenueNavigation() {
 
   const basePath = getBasePath();
   venueNav.innerHTML = appData.venues.map(venue => {
-    return `<a href="${basePath}venue/${venue.id.toLowerCase()}">${venue.nameJp || venue.id}（${venue.id}）</a>`;
+    const venueUrl = CONFIG.getPageUrl(basePath, `venue/${venue.id.toLowerCase()}`);
+    return `<a href="${venueUrl}">${venue.nameJp || venue.id}（${venue.id}）</a>`;
   }).join('');
 }
 
@@ -651,23 +652,32 @@ function initializeSpeakersPage() {
 
   if (!DOM.speakersGrid) return;
 
-  // 登壇者を「情報記載あり」→「情報記載なし」の順で、それぞれあいうえお順にソート
+  // 登壇者をセッションID順（A1, A2, AL, A3, B1...）でソート
+  const venueOrder = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'J', 'K', 'L'];
+  const timeSlotOrder = CONFIG.TIME_SLOT_ORDER; // ['1', '2', 'L', '3']
+
+  // セッションIDからソート用のインデックスを計算
+  const getSessionSortIndex = (sessionId) => {
+    if (!sessionId) return 999999;
+    const venue = sessionId.charAt(0);
+    const timeSlot = sessionId.substring(1);
+    const venueIndex = venueOrder.indexOf(venue);
+    const timeIndex = timeSlotOrder.indexOf(timeSlot);
+    return (venueIndex >= 0 ? venueIndex : 99) * 100 + (timeIndex >= 0 ? timeIndex : 99);
+  };
+
   const sortedSpeakers = [...appData.speakers].sort((a, b) => {
-    // 情報記載ありの判定（写真がdefault.svg以外、またはbioが入力されている）
-    const hasInfoA = (a.photo && !a.photo.includes('default.svg')) || (a.bio && a.bio.trim() !== '');
-    const hasInfoB = (b.photo && !b.photo.includes('default.svg')) || (b.bio && b.bio.trim() !== '');
+    // 各登壇者の最初のセッションIDを取得
+    const sessionA = a.sessions && a.sessions.length > 0 ? a.sessions[0] : null;
+    const sessionB = b.sessions && b.sessions.length > 0 ? b.sessions[0] : null;
 
-    // 情報記載ありを先に表示
-    if (hasInfoA && !hasInfoB) return -1;
-    if (!hasInfoA && hasInfoB) return 1;
+    // セッションがない場合は後ろに回す
+    if (!sessionA && sessionB) return 1;
+    if (sessionA && !sessionB) return -1;
+    if (!sessionA && !sessionB) return 0;
 
-    // 同じグループ内であいうえお順（nameKanaが空の場合は後ろに回す）
-    const kanaA = a.nameKana ? a.nameKana.trim() : '';
-    const kanaB = b.nameKana ? b.nameKana.trim() : '';
-    if (kanaA && !kanaB) return -1;
-    if (!kanaA && kanaB) return 1;
-    if (!kanaA && !kanaB) return 0;
-    return kanaA.localeCompare(kanaB, 'ja');
+    // セッションID順で比較
+    return getSessionSortIndex(sessionA) - getSessionSortIndex(sessionB);
   });
 
   renderSpeakers(sortedSpeakers);

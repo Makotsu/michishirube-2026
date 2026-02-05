@@ -20,5 +20,27 @@ const CONFIG = {
   UI: {
     DEBOUNCE_DELAY: 300,
     SCROLL_THRESHOLD: 300
+  },
+
+  /**
+   * ローカル環境かどうかを判定
+   * ローカルサーバー（localhost, 127.0.0.1, file://）ではtrue
+   */
+  isLocalEnvironment() {
+    const hostname = window.location.hostname;
+    const protocol = window.location.protocol;
+    return protocol === 'file:' ||
+           hostname === 'localhost' ||
+           hostname === '127.0.0.1' ||
+           hostname.startsWith('192.168.') ||
+           hostname.endsWith('.local');
+  },
+
+  /**
+   * HTMLページへのURLを取得（ローカル環境では.html付き）
+   */
+  getPageUrl(basePath, pagePath) {
+    const extension = this.isLocalEnvironment() ? '.html' : '';
+    return `${basePath}${pagePath}${extension}`;
   }
 };
