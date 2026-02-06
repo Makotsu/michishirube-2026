@@ -767,7 +767,7 @@ h6 { font-size: var(--text-base); }
   font-size: var(--text-sm);
   color: var(--color-text-sub);
   line-height: 1.6;
-  min-height: calc(var(--text-sm) * 1.6 * 3); /* 3行分の高さを確保 */
+  /* min-height削除: 肩書きの内容に応じた自然な高さにする */
   display: -webkit-box;
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
