@@ -90,6 +90,21 @@
   --venue-j: var(--color-sea);
   --venue-k: var(--color-heart);
   --venue-l: var(--color-culture);
+
+  /* ===== ダークセクション用カラー ===== */
+  --color-dark-bg: #141413;
+  --color-dark-bg-alt: #1e1e1c;
+  --color-dark-text: #f5f3ee;
+  --color-dark-text-sub: #c8c5bd;
+  --color-dark-border: #333330;
+
+  /* 装飾要素の透明度 */
+  --deco-opacity: 0.15;
+  --deco-opacity-light: 0.08;
+
+  /* 装飾アニメーション速度 */
+  --deco-float-duration: 20s;
+  --deco-float-duration-fast: 12s;
 }
 
 /* ========================================
@@ -190,6 +205,7 @@ h6 { font-size: var(--text-base); }
 .section {
   padding: var(--space-xl) 0;
 }
+
 
 /* ========================================
    Header & Navigation - 白基調エレガントスタイル
@@ -365,14 +381,50 @@ h6 { font-size: var(--text-base); }
 }
 
 /* ========================================
-   Page Header - シンプルな白基調
+   Page Header - 白基調 + 図1アート（screenブレンド）
 ======================================== */
 .page-header {
   background-color: var(--color-bg);
-  padding: var(--space-xl) 0 var(--space-l);
+  padding: var(--space-xl) 0 calc(var(--space-xl) * 1.2);
   text-align: center;
   position: relative;
   border-bottom: 1px solid var(--color-border);
+  overflow: hidden;
+}
+
+/* 図1画像レイヤー */
+.page-header-deco {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+
+/* 図1を右側に配置 */
+.page-header-deco::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  right: -20px;
+  transform: translateY(-50%);
+  width: 420px;
+  height: 140%;
+  background: url('../図1.png') right center / contain no-repeat;
+  opacity: 0.18;
+}
+
+/* 図1を左側にも反転配置 */
+.page-header-deco::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: -20px;
+  transform: translateY(-50%) scaleX(-1);
+  width: 360px;
+  height: 140%;
+  background: url('../図1.png') right center / contain no-repeat;
+  opacity: 0.1;
 }
 
 .page-header h1 {
@@ -380,6 +432,8 @@ h6 { font-size: var(--text-base); }
   position: relative;
   font-family: var(--font-heading);
   letter-spacing: 0.3em;
+  color: var(--color-text);
+  z-index: 1;
 }
 
 .page-header p {
@@ -388,7 +442,10 @@ h6 { font-size: var(--text-base); }
   max-width: 600px;
   margin: 0 auto;
   letter-spacing: 0.15em;
+  z-index: 1;
+  position: relative;
 }
+
 
 /* ========================================
    Search & Filter - シンプルなスタイル
@@ -583,6 +640,7 @@ h6 { font-size: var(--text-base); }
 .session-card:hover {
   border-color: var(--color-text);
   box-shadow: var(--shadow-l);
+  transform: translateY(-4px);
 }
 
 .session-card-header {
@@ -702,6 +760,8 @@ h6 { font-size: var(--text-base); }
 
 .speaker-card:hover {
   border-color: var(--color-text);
+  box-shadow: var(--shadow-l);
+  transform: translateY(-4px);
 }
 
 .speaker-card.highlight {
@@ -733,6 +793,12 @@ h6 { font-size: var(--text-base); }
   position: relative;
   z-index: 1;
   border: 1px solid var(--color-border);
+  transition: transform var(--ease-default), box-shadow var(--ease-default);
+}
+
+.speaker-card:hover .speaker-photo {
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .speaker-info {
@@ -862,6 +928,19 @@ h6 { font-size: var(--text-base); }
   background-color: var(--color-bg-alt);
 }
 
+/* タイムテーブル会場別カラー */
+td[data-venue="A"] .timetable-session { border-left-color: var(--venue-a); }
+td[data-venue="B"] .timetable-session { border-left-color: var(--venue-b); }
+td[data-venue="C"] .timetable-session { border-left-color: var(--venue-c); }
+td[data-venue="D"] .timetable-session { border-left-color: var(--venue-d); }
+td[data-venue="E"] .timetable-session { border-left-color: var(--venue-e); }
+td[data-venue="F"] .timetable-session { border-left-color: var(--venue-f); }
+td[data-venue="G"] .timetable-session { border-left-color: var(--venue-g); }
+td[data-venue="H"] .timetable-session { border-left-color: var(--venue-h); }
+td[data-venue="J"] .timetable-session { border-left-color: var(--venue-j); }
+td[data-venue="K"] .timetable-session { border-left-color: var(--venue-k); }
+td[data-venue="L"] .timetable-session { border-left-color: var(--venue-l); }
+
 .timetable-session h4 {
   font-size: var(--text-xs);
   font-family: var(--font-body);
@@ -931,6 +1010,27 @@ h6 { font-size: var(--text-base); }
 ======================================== */
 .venue-tabs {
   margin-bottom: var(--space-l);
+  position: relative;
+}
+
+/* 7色グラデーションのアクセントライン */
+.venue-tabs::before {
+  content: '';
+  display: block;
+  width: 60px;
+  height: 3px;
+  background: linear-gradient(
+    to right,
+    var(--color-sky),
+    var(--color-sea),
+    var(--color-land),
+    var(--color-culture),
+    var(--color-heart),
+    var(--color-star),
+    var(--color-spirit)
+  );
+  margin: 0 auto var(--space-l);
+  border-radius: 2px;
 }
 
 .venue-tabs-header {
@@ -979,22 +1079,18 @@ h6 { font-size: var(--text-base); }
   border-color: #141413;
 }
 
-/* 会場別タブカラー - シンプル化 */
-.venue-tab[data-venue="A"].active,
-.venue-tab[data-venue="B"].active,
-.venue-tab[data-venue="C"].active,
-.venue-tab[data-venue="D"].active,
-.venue-tab[data-venue="E"].active,
-.venue-tab[data-venue="F"].active,
-.venue-tab[data-venue="G"].active,
-.venue-tab[data-venue="H"].active,
-.venue-tab[data-venue="J"].active,
-.venue-tab[data-venue="K"].active,
-.venue-tab[data-venue="L"].active {
-  background-color: #141413;
-  color: #ffffff;
-  border-color: #141413;
-}
+/* 会場別タブカラー - 各会場の固有色で表現 */
+.venue-tab[data-venue="A"].active { background-color: var(--venue-a); color: #ffffff; border-color: var(--venue-a); }
+.venue-tab[data-venue="B"].active { background-color: var(--venue-b); color: #ffffff; border-color: var(--venue-b); }
+.venue-tab[data-venue="C"].active { background-color: var(--venue-c); color: #ffffff; border-color: var(--venue-c); }
+.venue-tab[data-venue="D"].active { background-color: var(--venue-d); color: #ffffff; border-color: var(--venue-d); }
+.venue-tab[data-venue="E"].active { background-color: var(--venue-e); color: #ffffff; border-color: var(--venue-e); }
+.venue-tab[data-venue="F"].active { background-color: var(--venue-f); color: #ffffff; border-color: var(--venue-f); }
+.venue-tab[data-venue="G"].active { background-color: var(--venue-g); color: #333333; border-color: var(--venue-g); }
+.venue-tab[data-venue="H"].active { background-color: var(--venue-h); color: #ffffff; border-color: var(--venue-h); }
+.venue-tab[data-venue="J"].active { background-color: var(--venue-j); color: #ffffff; border-color: var(--venue-j); }
+.venue-tab[data-venue="K"].active { background-color: var(--venue-k); color: #ffffff; border-color: var(--venue-k); }
+.venue-tab[data-venue="L"].active { background-color: var(--venue-l); color: #ffffff; border-color: var(--venue-l); }
 
 .venue-tab-content {
   display: none;
@@ -1025,7 +1121,22 @@ h6 { font-size: var(--text-base); }
   background-color: var(--color-bg);
   margin-bottom: var(--space-m);
   border: 1px solid var(--color-border);
+  position: relative;
+  overflow: hidden;
 }
+
+/* 会場サマリーのカラーアクセントバー */
+[data-venue="A"] .venue-summary { border-top: 3px solid var(--venue-a); }
+[data-venue="B"] .venue-summary { border-top: 3px solid var(--venue-b); }
+[data-venue="C"] .venue-summary { border-top: 3px solid var(--venue-c); }
+[data-venue="D"] .venue-summary { border-top: 3px solid var(--venue-d); }
+[data-venue="E"] .venue-summary { border-top: 3px solid var(--venue-e); }
+[data-venue="F"] .venue-summary { border-top: 3px solid var(--venue-f); }
+[data-venue="G"] .venue-summary { border-top: 3px solid var(--venue-g); }
+[data-venue="H"] .venue-summary { border-top: 3px solid var(--venue-h); }
+[data-venue="J"] .venue-summary { border-top: 3px solid var(--venue-j); }
+[data-venue="K"] .venue-summary { border-top: 3px solid var(--venue-k); }
+[data-venue="L"] .venue-summary { border-top: 3px solid var(--venue-l); }
 
 .venue-summary .venue-icon {
   width: 56px;
@@ -1042,21 +1153,18 @@ h6 { font-size: var(--text-base); }
   font-family: var(--font-heading-en);
 }
 
-/* 会場別アイコンカラー - シンプル化 */
-[data-venue="A"] .venue-icon,
-[data-venue="B"] .venue-icon,
-[data-venue="C"] .venue-icon,
-[data-venue="D"] .venue-icon,
-[data-venue="E"] .venue-icon,
-[data-venue="F"] .venue-icon,
-[data-venue="G"] .venue-icon,
-[data-venue="H"] .venue-icon,
-[data-venue="J"] .venue-icon,
-[data-venue="K"] .venue-icon,
-[data-venue="L"] .venue-icon {
-  background-color: #141413;
-  color: #ffffff;
-}
+/* 会場別アイコンカラー - 各会場の固有色で表現 */
+[data-venue="A"] .venue-icon { background-color: var(--venue-a); color: #ffffff; }
+[data-venue="B"] .venue-icon { background-color: var(--venue-b); color: #ffffff; }
+[data-venue="C"] .venue-icon { background-color: var(--venue-c); color: #ffffff; }
+[data-venue="D"] .venue-icon { background-color: var(--venue-d); color: #ffffff; }
+[data-venue="E"] .venue-icon { background-color: var(--venue-e); color: #ffffff; }
+[data-venue="F"] .venue-icon { background-color: var(--venue-f); color: #ffffff; }
+[data-venue="G"] .venue-icon { background-color: var(--venue-g); color: #333333; }
+[data-venue="H"] .venue-icon { background-color: var(--venue-h); color: #ffffff; }
+[data-venue="J"] .venue-icon { background-color: var(--venue-j); color: #ffffff; }
+[data-venue="K"] .venue-icon { background-color: var(--venue-k); color: #ffffff; }
+[data-venue="L"] .venue-icon { background-color: var(--venue-l); color: #ffffff; }
 
 .venue-summary .venue-info h3 {
   font-size: var(--text-lg);
@@ -1099,6 +1207,8 @@ h6 { font-size: var(--text-base); }
 
 .tab-session-item:hover {
   border-color: var(--color-text);
+  box-shadow: var(--shadow-m);
+  transform: translateY(-2px);
 }
 
 .tab-session-header {
@@ -1111,21 +1221,18 @@ h6 { font-size: var(--text-base); }
   border-bottom: 1px solid var(--color-border);
 }
 
-/* 会場別ヘッダーカラー - シンプル化 */
-[data-venue="A"] .tab-session-header,
-[data-venue="B"] .tab-session-header,
-[data-venue="C"] .tab-session-header,
-[data-venue="D"] .tab-session-header,
-[data-venue="E"] .tab-session-header,
-[data-venue="F"] .tab-session-header,
-[data-venue="G"] .tab-session-header,
-[data-venue="H"] .tab-session-header,
-[data-venue="J"] .tab-session-header,
-[data-venue="K"] .tab-session-header,
-[data-venue="L"] .tab-session-header {
-  background-color: var(--color-bg-alt);
-  color: var(--color-text);
-}
+/* 会場別セッションカード左ボーダー */
+[data-venue="A"] .tab-session-item { border-left: 3px solid var(--venue-a); }
+[data-venue="B"] .tab-session-item { border-left: 3px solid var(--venue-b); }
+[data-venue="C"] .tab-session-item { border-left: 3px solid var(--venue-c); }
+[data-venue="D"] .tab-session-item { border-left: 3px solid var(--venue-d); }
+[data-venue="E"] .tab-session-item { border-left: 3px solid var(--venue-e); }
+[data-venue="F"] .tab-session-item { border-left: 3px solid var(--venue-f); }
+[data-venue="G"] .tab-session-item { border-left: 3px solid var(--venue-g); }
+[data-venue="H"] .tab-session-item { border-left: 3px solid var(--venue-h); }
+[data-venue="J"] .tab-session-item { border-left: 3px solid var(--venue-j); }
+[data-venue="K"] .tab-session-item { border-left: 3px solid var(--venue-k); }
+[data-venue="L"] .tab-session-item { border-left: 3px solid var(--venue-l); }
 
 .tab-session-header .session-code {
   font-size: var(--text-xl);
@@ -1273,6 +1380,19 @@ h6 { font-size: var(--text-base); }
   color: #ffffff;
   border-color: #141413;
 }
+
+/* 会場ナビ - 各会場固有色でアクティブ表示 */
+[data-venue="A"] .venue-nav a.active { background-color: var(--venue-a); border-color: var(--venue-a); color: #ffffff; }
+[data-venue="B"] .venue-nav a.active { background-color: var(--venue-b); border-color: var(--venue-b); color: #ffffff; }
+[data-venue="C"] .venue-nav a.active { background-color: var(--venue-c); border-color: var(--venue-c); color: #ffffff; }
+[data-venue="D"] .venue-nav a.active { background-color: var(--venue-d); border-color: var(--venue-d); color: #ffffff; }
+[data-venue="E"] .venue-nav a.active { background-color: var(--venue-e); border-color: var(--venue-e); color: #ffffff; }
+[data-venue="F"] .venue-nav a.active { background-color: var(--venue-f); border-color: var(--venue-f); color: #ffffff; }
+[data-venue="G"] .venue-nav a.active { background-color: var(--venue-g); border-color: var(--venue-g); color: #333333; }
+[data-venue="H"] .venue-nav a.active { background-color: var(--venue-h); border-color: var(--venue-h); color: #ffffff; }
+[data-venue="J"] .venue-nav a.active { background-color: var(--venue-j); border-color: var(--venue-j); color: #ffffff; }
+[data-venue="K"] .venue-nav a.active { background-color: var(--venue-k); border-color: var(--venue-k); color: #ffffff; }
+[data-venue="L"] .venue-nav a.active { background-color: var(--venue-l); border-color: var(--venue-l); color: #ffffff; }
 
 .venue-sessions {
   display: flex;
@@ -1460,7 +1580,7 @@ h6 { font-size: var(--text-base); }
 }
 
 /* ========================================
-   Footer - 白基調シンプルスタイル
+   Footer - ダークテーマ（図1アート風ブックエンド）
 ======================================== */
 .footer {
   background-color: var(--color-bg);
@@ -1468,6 +1588,41 @@ h6 { font-size: var(--text-base); }
   padding: var(--space-xl) 0 var(--space-l);
   margin-top: var(--space-xl);
   border-top: 1px solid var(--color-border);
+  position: relative;
+  overflow: hidden;
+}
+
+/* 図1を右側に配置 */
+.footer::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  right: -10px;
+  transform: translateY(-50%);
+  width: 350px;
+  height: 140%;
+  background: url('../図1.png') right center / contain no-repeat;
+  opacity: 0.15;
+  pointer-events: none;
+}
+
+/* 図1を左側に反転配置 */
+.footer::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: -10px;
+  transform: translateY(-50%) scaleX(-1);
+  width: 280px;
+  height: 140%;
+  background: url('../図1.png') right center / contain no-repeat;
+  opacity: 0.08;
+  pointer-events: none;
+}
+
+.footer .container {
+  position: relative;
+  z-index: 1;
 }
 
 .footer-content {
@@ -1511,7 +1666,7 @@ h6 { font-size: var(--text-base); }
 .footer-links a {
   font-size: var(--text-sm);
   display: inline-block;
-  padding: 0.5rem 0; /* パディング拡大 */
+  padding: 0.5rem 0;
 }
 
 .footer-bottom {
@@ -1561,7 +1716,7 @@ h6 { font-size: var(--text-base); }
 }
 
 .back-to-top:hover {
-  background-color: #333333;
+  background-color: var(--color-sea);
 }
 
 .back-to-top svg {
@@ -1685,11 +1840,32 @@ h6 { font-size: var(--text-base); }
   }
 
   .page-header {
-    padding: var(--space-l) 0;
+    padding: var(--space-l) 0 calc(var(--space-l) * 1.2);
   }
 
   .page-header h1 {
     font-size: var(--text-3xl);
+  }
+
+  /* モバイル: 図1画像を縮小 */
+  .page-header-deco::before {
+    width: 200px;
+    opacity: 0.4;
+  }
+
+  .page-header-deco::after {
+    width: 150px;
+    opacity: 0.2;
+  }
+
+  .footer::before {
+    width: 150px;
+    opacity: 0.25;
+  }
+
+  .footer::after {
+    width: 120px;
+    opacity: 0.15;
   }
 
   .sessions-grid,
@@ -2140,4 +2316,28 @@ html.font-size-large {
 
 .loading-container p {
   color: var(--color-text-muted);
+}
+
+/* ========================================
+   Decorative Animations - 図1アート要素
+======================================== */
+@keyframes floatSlow {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-15px) rotate(3deg); }
+}
+
+@keyframes floatMedium {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  33% { transform: translateY(-10px) rotate(-2deg); }
+  66% { transform: translateY(5px) rotate(2deg); }
+}
+
+@keyframes sparkle {
+  0%, 100% { opacity: var(--deco-opacity); transform: scale(1); }
+  50% { opacity: calc(var(--deco-opacity) * 1.8); transform: scale(1.1); }
+}
+
+@keyframes driftHorizontal {
+  0%, 100% { transform: translateX(0); }
+  50% { transform: translateX(10px); }
 }

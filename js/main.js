@@ -661,7 +661,7 @@ function renderTimetableMobile() {
     if (slotSessions.length === 0) return '';
 
     const sessionsHtml = slotSessions.map(({ session, venue }) => `
-      <div class="timetable-mobile-session" data-session-id="${session.id}">
+      <div class="timetable-mobile-session" data-session-id="${session.id}" data-venue="${venue.id}">
         <div class="timetable-mobile-session-header">
           <span class="timetable-mobile-session-venue">${venue.nameJp || venue.id}</span>
           <span class="timetable-mobile-session-code">${session.venueCode}</span>
