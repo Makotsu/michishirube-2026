@@ -90,21 +90,6 @@
   --venue-j: var(--color-sea);
   --venue-k: var(--color-heart);
   --venue-l: var(--color-culture);
-
-  /* ===== ダークセクション用カラー ===== */
-  --color-dark-bg: #141413;
-  --color-dark-bg-alt: #1e1e1c;
-  --color-dark-text: #f5f3ee;
-  --color-dark-text-sub: #c8c5bd;
-  --color-dark-border: #333330;
-
-  /* 装飾要素の透明度 */
-  --deco-opacity: 0.15;
-  --deco-opacity-light: 0.08;
-
-  /* 装飾アニメーション速度 */
-  --deco-float-duration: 20s;
-  --deco-float-duration-fast: 12s;
 }
 
 /* ========================================
@@ -381,50 +366,14 @@ h6 { font-size: var(--text-base); }
 }
 
 /* ========================================
-   Page Header - 白基調 + 図1アート（screenブレンド）
+   Page Header - シンプルな白基調
 ======================================== */
 .page-header {
   background-color: var(--color-bg);
-  padding: var(--space-xl) 0 calc(var(--space-xl) * 1.2);
+  padding: var(--space-xl) 0 var(--space-l);
   text-align: center;
   position: relative;
   border-bottom: 1px solid var(--color-border);
-  overflow: hidden;
-}
-
-/* 図1画像レイヤー */
-.page-header-deco {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  z-index: 0;
-  overflow: hidden;
-}
-
-/* 図1を右側に配置 */
-.page-header-deco::before {
-  content: '';
-  position: absolute;
-  top: 50%;
-  right: -20px;
-  transform: translateY(-50%);
-  width: 420px;
-  height: 140%;
-  background: url('../図1.png') right center / contain no-repeat;
-  opacity: 0.18;
-}
-
-/* 図1を左側にも反転配置 */
-.page-header-deco::after {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: -20px;
-  transform: translateY(-50%) scaleX(-1);
-  width: 360px;
-  height: 140%;
-  background: url('../図1.png') right center / contain no-repeat;
-  opacity: 0.1;
 }
 
 .page-header h1 {
@@ -432,8 +381,6 @@ h6 { font-size: var(--text-base); }
   position: relative;
   font-family: var(--font-heading);
   letter-spacing: 0.3em;
-  color: var(--color-text);
-  z-index: 1;
 }
 
 .page-header p {
@@ -442,8 +389,6 @@ h6 { font-size: var(--text-base); }
   max-width: 600px;
   margin: 0 auto;
   letter-spacing: 0.15em;
-  z-index: 1;
-  position: relative;
 }
 
 
@@ -1580,7 +1525,7 @@ td[data-venue="L"] .timetable-session { border-left-color: var(--venue-l); }
 }
 
 /* ========================================
-   Footer - ダークテーマ（図1アート風ブックエンド）
+   Footer - 白基調シンプルスタイル
 ======================================== */
 .footer {
   background-color: var(--color-bg);
@@ -1588,41 +1533,6 @@ td[data-venue="L"] .timetable-session { border-left-color: var(--venue-l); }
   padding: var(--space-xl) 0 var(--space-l);
   margin-top: var(--space-xl);
   border-top: 1px solid var(--color-border);
-  position: relative;
-  overflow: hidden;
-}
-
-/* 図1を右側に配置 */
-.footer::before {
-  content: '';
-  position: absolute;
-  top: 50%;
-  right: -10px;
-  transform: translateY(-50%);
-  width: 350px;
-  height: 140%;
-  background: url('../図1.png') right center / contain no-repeat;
-  opacity: 0.15;
-  pointer-events: none;
-}
-
-/* 図1を左側に反転配置 */
-.footer::after {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: -10px;
-  transform: translateY(-50%) scaleX(-1);
-  width: 280px;
-  height: 140%;
-  background: url('../図1.png') right center / contain no-repeat;
-  opacity: 0.08;
-  pointer-events: none;
-}
-
-.footer .container {
-  position: relative;
-  z-index: 1;
 }
 
 .footer-content {
@@ -1840,32 +1750,11 @@ td[data-venue="L"] .timetable-session { border-left-color: var(--venue-l); }
   }
 
   .page-header {
-    padding: var(--space-l) 0 calc(var(--space-l) * 1.2);
+    padding: var(--space-l) 0;
   }
 
   .page-header h1 {
     font-size: var(--text-3xl);
-  }
-
-  /* モバイル: 図1画像を縮小 */
-  .page-header-deco::before {
-    width: 200px;
-    opacity: 0.4;
-  }
-
-  .page-header-deco::after {
-    width: 150px;
-    opacity: 0.2;
-  }
-
-  .footer::before {
-    width: 150px;
-    opacity: 0.25;
-  }
-
-  .footer::after {
-    width: 120px;
-    opacity: 0.15;
   }
 
   .sessions-grid,
@@ -2316,28 +2205,4 @@ html.font-size-large {
 
 .loading-container p {
   color: var(--color-text-muted);
-}
-
-/* ========================================
-   Decorative Animations - 図1アート要素
-======================================== */
-@keyframes floatSlow {
-  0%, 100% { transform: translateY(0) rotate(0deg); }
-  50% { transform: translateY(-15px) rotate(3deg); }
-}
-
-@keyframes floatMedium {
-  0%, 100% { transform: translateY(0) rotate(0deg); }
-  33% { transform: translateY(-10px) rotate(-2deg); }
-  66% { transform: translateY(5px) rotate(2deg); }
-}
-
-@keyframes sparkle {
-  0%, 100% { opacity: var(--deco-opacity); transform: scale(1); }
-  50% { opacity: calc(var(--deco-opacity) * 1.8); transform: scale(1.1); }
-}
-
-@keyframes driftHorizontal {
-  0%, 100% { transform: translateX(0); }
-  50% { transform: translateX(10px); }
 }
