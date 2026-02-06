@@ -1912,6 +1912,106 @@ select:focus-visible {
 }
 
 /* ========================================
+   Timetable Mobile - スマホ用カードレイアウト
+======================================== */
+.timetable-mobile {
+  display: none;
+}
+
+@media (max-width: 767px) {
+  /* PC用テーブルを非表示 */
+  .timetable-wrapper {
+    display: none;
+  }
+
+  /* モバイル用レイアウトを表示 */
+  .timetable-mobile {
+    display: block;
+  }
+
+  .timetable-mobile-slot {
+    margin-bottom: var(--space-l);
+  }
+
+  .timetable-mobile-slot-header {
+    background-color: var(--color-bg-alt);
+    padding: var(--space-m);
+    border: 1px solid var(--color-border);
+    border-bottom: none;
+    text-align: center;
+  }
+
+  .timetable-mobile-slot-header h3 {
+    font-size: var(--text-lg);
+    font-family: var(--font-heading);
+    font-weight: 400;
+    letter-spacing: 0.1em;
+    margin-bottom: 0.25rem;
+  }
+
+  .timetable-mobile-slot-header small {
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+  }
+
+  .timetable-mobile-sessions {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .timetable-mobile-session {
+    background-color: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-top: none;
+    padding: var(--space-m);
+    cursor: pointer;
+    transition: var(--ease-default);
+  }
+
+  .timetable-mobile-session:first-child {
+    border-top: 1px solid var(--color-border);
+  }
+
+  .timetable-mobile-session:hover {
+    background-color: var(--color-bg-alt);
+  }
+
+  .timetable-mobile-session-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--space-xs);
+  }
+
+  .timetable-mobile-session-venue {
+    background-color: #141413;
+    color: #ffffff;
+    padding: 0.25rem 0.75rem;
+    font-size: var(--text-sm);
+    font-weight: 500;
+  }
+
+  .timetable-mobile-session-code {
+    font-size: var(--text-xs);
+    color: var(--color-text-muted);
+  }
+
+  .timetable-mobile-session h4 {
+    font-size: var(--text-base);
+    font-family: var(--font-body);
+    font-weight: 500;
+    line-height: 1.5;
+    margin-bottom: var(--space-xs);
+  }
+
+  .timetable-mobile-session .speakers {
+    font-size: var(--text-sm);
+    color: var(--color-text-sub);
+    line-height: 1.6;
+  }
+}
+
+/* ========================================
    Font Size Switcher - フォントサイズ切り替え
 ======================================== */
 html.font-size-small {

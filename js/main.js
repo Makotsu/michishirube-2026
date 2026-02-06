@@ -555,10 +555,12 @@ function createSessionCard(session) {
 function initializeTimetablePage() {
   DOM.timetableBody = document.getElementById('timetable-body');
   DOM.timetableHead = document.querySelector('.timetable thead tr');
+  DOM.timetableWrapper = document.querySelector('.timetable-wrapper');
   if (!DOM.timetableBody) return;
 
   renderTimetableHeader();
   renderTimetable();
+  renderTimetableMobile();
   updateVenueNavigation();
 }
 
@@ -627,6 +629,67 @@ function renderTimetable() {
   }).join('');
 
   DOM.timetableBody.innerHTML = rows;
+}
+
+/**
+ * モバイル用タイムテーブルをレンダリング
+ */
+function renderTimetableMobile() {
+  if (!DOM.timetableWrapper) return;
+
+  // モバイル用コンテナを作成
+  const mobileContainer = document.createElement('div');
+  mobileContainer.className = 'timetable-mobile';
+
+  // 時間帯を正しい順序でソート
+  const sortedTimeSlots = [...appData.timeSlots].sort((a, b) => {
+    return CONFIG.TIME_SLOT_ORDER.indexOf(a.id) - CONFIG.TIME_SLOT_ORDER.indexOf(b.id);
+  });
+
+  // 時間帯ごとにセッションをグループ化
+  const slotsHtml = sortedTimeSlots.map(slot => {
+    // この時間帯のセッションを取得（会場順）
+    const slotSessions = appData.venues
+      .map(venue => {
+        const session = appData.sessions.find(s =>
+          s.venue === venue.id && s.timeSlot === slot.id
+        );
+        return session ? { session, venue } : null;
+      })
+      .filter(Boolean);
+
+    if (slotSessions.length === 0) return '';
+
+    const sessionsHtml = slotSessions.map(({ session, venue }) => `
+      <div class="timetable-mobile-session" data-session-id="${session.id}">
+        <div class="timetable-mobile-session-header">
+          <span class="timetable-mobile-session-venue">${venue.nameJp || venue.id}</span>
+          <span class="timetable-mobile-session-code">${session.venueCode}</span>
+        </div>
+        <h4>${escapeHtml(session.title)}</h4>
+        <div class="speakers">${session.speakers.map(s => s.name).join('、')}</div>
+      </div>
+    `).join('');
+
+    const timeLabel = slot.label ? `<small>${slot.label}</small>` : '';
+
+    return `
+      <div class="timetable-mobile-slot" data-timeslot="${slot.id}">
+        <div class="timetable-mobile-slot-header">
+          <h3>${slot.name}</h3>
+          ${timeLabel}
+        </div>
+        <div class="timetable-mobile-sessions">
+          ${sessionsHtml}
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  mobileContainer.innerHTML = slotsHtml;
+
+  // テーブルの後にモバイル用コンテナを挿入
+  DOM.timetableWrapper.parentNode.insertBefore(mobileContainer, DOM.timetableWrapper.nextSibling);
 }
 
 /**
@@ -1035,8 +1098,8 @@ document.body.addEventListener('click', (e) => {
     return;
   }
 
-  // セッションモーダル表示（タイムテーブル）
-  const sessionTrigger = e.target.closest('.timetable-session[data-session-id]');
+  // セッションモーダル表示（タイムテーブル - PC/モバイル両対応）
+  const sessionTrigger = e.target.closest('.timetable-session[data-session-id], .timetable-mobile-session[data-session-id]');
   if (sessionTrigger) {
     const sessionId = sessionTrigger.dataset.sessionId;
     const session = appData.sessions.find(s => s.id === sessionId);
