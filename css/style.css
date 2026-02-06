@@ -60,7 +60,7 @@
   /* 角丸（控えめに） */
   --radius-s: 4px;
   --radius-m: 8px;
-  --radius-l: 4px;
+  --radius-l: 12px;
   --radius-full: 50%;
 
   /* シャドウ（控えめに） */
@@ -78,6 +78,9 @@
   --container-max: 1200px;
   --header-height: 72px;
 
+  /* アイコン */
+  --icon-search: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23999'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z'%3E%3C/path%3E%3C/svg%3E");
+
   /* 会場別カラー */
   --venue-a: var(--color-sky);
   --venue-b: var(--color-sea);
@@ -91,6 +94,19 @@
   --venue-k: var(--color-heart);
   --venue-l: var(--color-culture);
 }
+
+/* 会場別カラー変数の集約定義 */
+[data-venue="A"] { --venue-color: var(--venue-a); --venue-text: #ffffff; }
+[data-venue="B"] { --venue-color: var(--venue-b); --venue-text: #ffffff; }
+[data-venue="C"] { --venue-color: var(--venue-c); --venue-text: #ffffff; }
+[data-venue="D"] { --venue-color: var(--venue-d); --venue-text: #ffffff; }
+[data-venue="E"] { --venue-color: var(--venue-e); --venue-text: #ffffff; }
+[data-venue="F"] { --venue-color: var(--venue-f); --venue-text: #ffffff; }
+[data-venue="G"] { --venue-color: var(--venue-g); --venue-text: #333333; }
+[data-venue="H"] { --venue-color: var(--venue-h); --venue-text: #ffffff; }
+[data-venue="J"] { --venue-color: var(--venue-j); --venue-text: #ffffff; }
+[data-venue="K"] { --venue-color: var(--venue-k); --venue-text: #ffffff; }
+[data-venue="L"] { --venue-color: var(--venue-l); --venue-text: #ffffff; }
 
 /* ========================================
    Reset & Base
@@ -431,24 +447,7 @@ h6 { font-size: var(--text-base); }
   color: var(--color-text-muted);
 }
 
-.search-box::before {
-  content: '';
-  position: absolute;
-  left: 1rem;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 20px;
-  height: 20px;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23999'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z'%3E%3C/path%3E%3C/svg%3E");
-  background-size: contain;
-  opacity: 0.6;
-}
-
-.tab-search-bar {
-  margin-bottom: var(--space-m);
-  position: relative;
-}
-
+.search-box::before,
 .tab-search-bar::before {
   content: '';
   position: absolute;
@@ -457,10 +456,15 @@ h6 { font-size: var(--text-base); }
   transform: translateY(-50%);
   width: 20px;
   height: 20px;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23999'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z'%3E%3C/path%3E%3C/svg%3E");
+  background-image: var(--icon-search);
   background-size: contain;
   opacity: 0.6;
   z-index: 1;
+}
+
+.tab-search-bar {
+  margin-bottom: var(--space-m);
+  position: relative;
 }
 
 .tab-search-bar input {
@@ -874,17 +878,7 @@ h6 { font-size: var(--text-base); }
 }
 
 /* タイムテーブル会場別カラー */
-td[data-venue="A"] .timetable-session { border-left-color: var(--venue-a); }
-td[data-venue="B"] .timetable-session { border-left-color: var(--venue-b); }
-td[data-venue="C"] .timetable-session { border-left-color: var(--venue-c); }
-td[data-venue="D"] .timetable-session { border-left-color: var(--venue-d); }
-td[data-venue="E"] .timetable-session { border-left-color: var(--venue-e); }
-td[data-venue="F"] .timetable-session { border-left-color: var(--venue-f); }
-td[data-venue="G"] .timetable-session { border-left-color: var(--venue-g); }
-td[data-venue="H"] .timetable-session { border-left-color: var(--venue-h); }
-td[data-venue="J"] .timetable-session { border-left-color: var(--venue-j); }
-td[data-venue="K"] .timetable-session { border-left-color: var(--venue-k); }
-td[data-venue="L"] .timetable-session { border-left-color: var(--venue-l); }
+td[data-venue] .timetable-session { border-left-color: var(--venue-color); }
 
 .timetable-session h4 {
   font-size: var(--text-xs);
@@ -900,7 +894,7 @@ td[data-venue="L"] .timetable-session { border-left-color: var(--venue-l); }
 }
 
 .timetable-session:hover .speakers {
-  color: rgba(255, 255, 255, 0.9);
+  color: var(--color-text-sub);
 }
 
 /* タイムテーブルヘッダー */
@@ -1025,17 +1019,7 @@ td[data-venue="L"] .timetable-session { border-left-color: var(--venue-l); }
 }
 
 /* 会場別タブカラー - 各会場の固有色で表現 */
-.venue-tab[data-venue="A"].active { background-color: var(--venue-a); color: #ffffff; border-color: var(--venue-a); }
-.venue-tab[data-venue="B"].active { background-color: var(--venue-b); color: #ffffff; border-color: var(--venue-b); }
-.venue-tab[data-venue="C"].active { background-color: var(--venue-c); color: #ffffff; border-color: var(--venue-c); }
-.venue-tab[data-venue="D"].active { background-color: var(--venue-d); color: #ffffff; border-color: var(--venue-d); }
-.venue-tab[data-venue="E"].active { background-color: var(--venue-e); color: #ffffff; border-color: var(--venue-e); }
-.venue-tab[data-venue="F"].active { background-color: var(--venue-f); color: #ffffff; border-color: var(--venue-f); }
-.venue-tab[data-venue="G"].active { background-color: var(--venue-g); color: #333333; border-color: var(--venue-g); }
-.venue-tab[data-venue="H"].active { background-color: var(--venue-h); color: #ffffff; border-color: var(--venue-h); }
-.venue-tab[data-venue="J"].active { background-color: var(--venue-j); color: #ffffff; border-color: var(--venue-j); }
-.venue-tab[data-venue="K"].active { background-color: var(--venue-k); color: #ffffff; border-color: var(--venue-k); }
-.venue-tab[data-venue="L"].active { background-color: var(--venue-l); color: #ffffff; border-color: var(--venue-l); }
+.venue-tab[data-venue].active { background-color: var(--venue-color); color: var(--venue-text); border-color: var(--venue-color); }
 
 .venue-tab-content {
   display: none;
@@ -1071,17 +1055,7 @@ td[data-venue="L"] .timetable-session { border-left-color: var(--venue-l); }
 }
 
 /* 会場サマリーのカラーアクセントバー */
-[data-venue="A"] .venue-summary { border-top: 3px solid var(--venue-a); }
-[data-venue="B"] .venue-summary { border-top: 3px solid var(--venue-b); }
-[data-venue="C"] .venue-summary { border-top: 3px solid var(--venue-c); }
-[data-venue="D"] .venue-summary { border-top: 3px solid var(--venue-d); }
-[data-venue="E"] .venue-summary { border-top: 3px solid var(--venue-e); }
-[data-venue="F"] .venue-summary { border-top: 3px solid var(--venue-f); }
-[data-venue="G"] .venue-summary { border-top: 3px solid var(--venue-g); }
-[data-venue="H"] .venue-summary { border-top: 3px solid var(--venue-h); }
-[data-venue="J"] .venue-summary { border-top: 3px solid var(--venue-j); }
-[data-venue="K"] .venue-summary { border-top: 3px solid var(--venue-k); }
-[data-venue="L"] .venue-summary { border-top: 3px solid var(--venue-l); }
+[data-venue] .venue-summary { border-top: 3px solid var(--venue-color); }
 
 .venue-summary .venue-icon {
   width: 56px;
@@ -1099,17 +1073,7 @@ td[data-venue="L"] .timetable-session { border-left-color: var(--venue-l); }
 }
 
 /* 会場別アイコンカラー - 各会場の固有色で表現 */
-[data-venue="A"] .venue-icon { background-color: var(--venue-a); color: #ffffff; }
-[data-venue="B"] .venue-icon { background-color: var(--venue-b); color: #ffffff; }
-[data-venue="C"] .venue-icon { background-color: var(--venue-c); color: #ffffff; }
-[data-venue="D"] .venue-icon { background-color: var(--venue-d); color: #ffffff; }
-[data-venue="E"] .venue-icon { background-color: var(--venue-e); color: #ffffff; }
-[data-venue="F"] .venue-icon { background-color: var(--venue-f); color: #ffffff; }
-[data-venue="G"] .venue-icon { background-color: var(--venue-g); color: #333333; }
-[data-venue="H"] .venue-icon { background-color: var(--venue-h); color: #ffffff; }
-[data-venue="J"] .venue-icon { background-color: var(--venue-j); color: #ffffff; }
-[data-venue="K"] .venue-icon { background-color: var(--venue-k); color: #ffffff; }
-[data-venue="L"] .venue-icon { background-color: var(--venue-l); color: #ffffff; }
+[data-venue] .venue-icon { background-color: var(--venue-color); color: var(--venue-text); }
 
 .venue-summary .venue-info h3 {
   font-size: var(--text-lg);
@@ -1167,17 +1131,7 @@ td[data-venue="L"] .timetable-session { border-left-color: var(--venue-l); }
 }
 
 /* 会場別セッションカード左ボーダー */
-[data-venue="A"] .tab-session-item { border-left: 3px solid var(--venue-a); }
-[data-venue="B"] .tab-session-item { border-left: 3px solid var(--venue-b); }
-[data-venue="C"] .tab-session-item { border-left: 3px solid var(--venue-c); }
-[data-venue="D"] .tab-session-item { border-left: 3px solid var(--venue-d); }
-[data-venue="E"] .tab-session-item { border-left: 3px solid var(--venue-e); }
-[data-venue="F"] .tab-session-item { border-left: 3px solid var(--venue-f); }
-[data-venue="G"] .tab-session-item { border-left: 3px solid var(--venue-g); }
-[data-venue="H"] .tab-session-item { border-left: 3px solid var(--venue-h); }
-[data-venue="J"] .tab-session-item { border-left: 3px solid var(--venue-j); }
-[data-venue="K"] .tab-session-item { border-left: 3px solid var(--venue-k); }
-[data-venue="L"] .tab-session-item { border-left: 3px solid var(--venue-l); }
+[data-venue] .tab-session-item { border-left: 3px solid var(--venue-color); }
 
 .tab-session-header .session-code {
   font-size: var(--text-xl);
@@ -1236,6 +1190,10 @@ td[data-venue="L"] .timetable-session { border-left-color: var(--venue-l); }
   border: 1px solid var(--color-border);
   min-width: 0;
   overflow: hidden;
+  cursor: pointer;
+  font: inherit;
+  text-align: left;
+  width: 100%;
 }
 
 .speaker-item:hover {
@@ -1327,17 +1285,7 @@ td[data-venue="L"] .timetable-session { border-left-color: var(--venue-l); }
 }
 
 /* 会場ナビ - 各会場固有色でアクティブ表示 */
-[data-venue="A"] .venue-nav a.active { background-color: var(--venue-a); border-color: var(--venue-a); color: #ffffff; }
-[data-venue="B"] .venue-nav a.active { background-color: var(--venue-b); border-color: var(--venue-b); color: #ffffff; }
-[data-venue="C"] .venue-nav a.active { background-color: var(--venue-c); border-color: var(--venue-c); color: #ffffff; }
-[data-venue="D"] .venue-nav a.active { background-color: var(--venue-d); border-color: var(--venue-d); color: #ffffff; }
-[data-venue="E"] .venue-nav a.active { background-color: var(--venue-e); border-color: var(--venue-e); color: #ffffff; }
-[data-venue="F"] .venue-nav a.active { background-color: var(--venue-f); border-color: var(--venue-f); color: #ffffff; }
-[data-venue="G"] .venue-nav a.active { background-color: var(--venue-g); border-color: var(--venue-g); color: #333333; }
-[data-venue="H"] .venue-nav a.active { background-color: var(--venue-h); border-color: var(--venue-h); color: #ffffff; }
-[data-venue="J"] .venue-nav a.active { background-color: var(--venue-j); border-color: var(--venue-j); color: #ffffff; }
-[data-venue="K"] .venue-nav a.active { background-color: var(--venue-k); border-color: var(--venue-k); color: #ffffff; }
-[data-venue="L"] .venue-nav a.active { background-color: var(--venue-l); border-color: var(--venue-l); color: #ffffff; }
+[data-venue] .venue-nav a.active { background-color: var(--venue-color); border-color: var(--venue-color); color: var(--venue-text); }
 
 .venue-sessions {
   display: flex;
@@ -1392,6 +1340,10 @@ td[data-venue="L"] .timetable-session { border-left-color: var(--venue-l); }
   background-color: var(--color-bg);
   transition: var(--ease-default);
   border: 1px solid var(--color-border);
+  cursor: pointer;
+  font: inherit;
+  text-align: left;
+  width: 100%;
 }
 
 .venue-speaker:hover {

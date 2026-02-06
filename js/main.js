@@ -18,6 +18,7 @@ const DOM = {};
  * 初期化
  */
 document.addEventListener('DOMContentLoaded', async () => {
+  initializeImageErrorHandler();
   initializeFontSizeControls();
   await loadData();
   initializeNavigation();
@@ -25,6 +26,17 @@ document.addEventListener('DOMContentLoaded', async () => {
   initializeScrollAnimations();
   initializePage();
 });
+
+/**
+ * 画像読み込みエラーのグローバルハンドラ
+ */
+function initializeImageErrorHandler() {
+  document.addEventListener('error', (e) => {
+    if (e.target.tagName === 'IMG' && e.target.closest('.speaker-photo, .speaker-item, .venue-speaker, .modal-body')) {
+      e.target.src = `${getBasePath()}images/speakers/default.svg`;
+    }
+  }, true);
+}
 
 /**
  * フォントサイズ切り替え機能の初期化
@@ -74,7 +86,8 @@ async function loadData() {
     const basePath = getBasePath();
     const response = await fetch(`${basePath}data/sessions.json`);
     if (!response.ok) throw new Error('データの読み込みに失敗しました');
-    appData = await response.json();
+    const data = await response.json();
+    Object.assign(appData, data);
   } catch (error) {
     console.error('Error loading data:', error);
     showError('データの読み込みに失敗しました。ページを再読み込みしてください。');
@@ -82,15 +95,9 @@ async function loadData() {
 }
 
 /**
- * ベースパスを取得
+ * ベースパスを取得（Utils への委譲）
  */
-function getBasePath() {
-  const path = window.location.pathname;
-  if (path.includes('/venue/')) {
-    return '../';
-  }
-  return '';
-}
+const getBasePath = Utils.getBasePath.bind(Utils);
 
 /**
  * ナビゲーションの初期化
@@ -124,11 +131,14 @@ function initializeBackToTop() {
   const backToTop = document.querySelector('.back-to-top');
   if (!backToTop) return;
 
+  let ticking = false;
   window.addEventListener('scroll', () => {
-    if (window.scrollY > 300) {
-      backToTop.classList.add('visible');
-    } else {
-      backToTop.classList.remove('visible');
+    if (!ticking) {
+      requestAnimationFrame(() => {
+        backToTop.classList.toggle('visible', window.scrollY > 300);
+        ticking = false;
+      });
+      ticking = true;
     }
   });
 
@@ -253,14 +263,26 @@ function scrollToSession(sessionId) {
   const venueId = session.venue;
   const tab = DOM.venueTabs.querySelector(`.venue-tab[data-venue="${venueId}"]`);
   if (tab) {
-    // タブのアクティブ状態を更新
-    DOM.venueTabs.querySelectorAll('.venue-tab').forEach(t => t.classList.remove('active'));
+    // タブのアクティブ状態・ARIA属性を更新
+    DOM.venueTabs.querySelectorAll('.venue-tab').forEach(t => {
+      t.classList.remove('active');
+      t.setAttribute('aria-selected', 'false');
+      t.setAttribute('tabindex', '-1');
+    });
     tab.classList.add('active');
+    tab.setAttribute('aria-selected', 'true');
+    tab.setAttribute('tabindex', '0');
 
     // コンテンツのアクティブ状態を更新
-    DOM.tabContents.querySelectorAll('.venue-tab-content').forEach(c => c.classList.remove('active'));
+    DOM.tabContents.querySelectorAll('.venue-tab-content').forEach(c => {
+      c.classList.remove('active');
+      c.setAttribute('hidden', '');
+    });
     const content = DOM.tabContents.querySelector(`.venue-tab-content[data-venue="${venueId}"]`);
-    if (content) content.classList.add('active');
+    if (content) {
+      content.classList.add('active');
+      content.removeAttribute('hidden');
+    }
   }
 
   // 該当セッションにスクロール
@@ -292,11 +314,18 @@ function showLoadingSpinner(container) {
 function renderVenueTabs() {
   const basePath = getBasePath();
 
-  // タブヘッダーを生成
+  // タブヘッダーを生成（ARIA タブパターン対応）
   const tabsHtml = appData.venues.map((venue, index) => {
     const sessionCount = appData.sessions.filter(s => s.venue === venue.id).length;
+    const isActive = index === 0;
     return `
-      <button class="venue-tab ${index === 0 ? 'active' : ''}" data-venue="${venue.id}">
+      <button class="venue-tab ${isActive ? 'active' : ''}"
+              data-venue="${venue.id}"
+              role="tab"
+              id="tab-${venue.id}"
+              aria-selected="${isActive}"
+              aria-controls="panel-${venue.id}"
+              tabindex="${isActive ? '0' : '-1'}">
         ${venue.nameJp || venue.id}
         <small>(${sessionCount})</small>
       </button>
@@ -312,9 +341,15 @@ function renderVenueTabs() {
       .sort((a, b) => {
         return CONFIG.TIME_SLOT_ORDER.indexOf(a.timeSlot) - CONFIG.TIME_SLOT_ORDER.indexOf(b.timeSlot);
       });
+    const isActive = index === 0;
 
     return `
-      <div class="venue-tab-content ${index === 0 ? 'active' : ''}" data-venue="${venue.id}">
+      <div class="venue-tab-content ${isActive ? 'active' : ''}"
+           data-venue="${venue.id}"
+           role="tabpanel"
+           id="panel-${venue.id}"
+           aria-labelledby="tab-${venue.id}"
+           ${isActive ? '' : 'hidden'}>
         <div class="venue-summary">
           <div class="venue-icon">${venue.nameJp || venue.id}</div>
           <div class="venue-info">
@@ -332,20 +367,62 @@ function renderVenueTabs() {
 
   DOM.tabContents.innerHTML = contentsHtml;
 
-  // タブ切り替えイベント
-  DOM.venueTabs.querySelectorAll('.venue-tab').forEach(tab => {
-    tab.addEventListener('click', () => {
-      const venueId = tab.dataset.venue;
+  // タブ切り替え関数
+  function switchTab(tab) {
+    const venueId = tab.dataset.venue;
 
-      // タブのアクティブ状態を更新
-      DOM.venueTabs.querySelectorAll('.venue-tab').forEach(t => t.classList.remove('active'));
-      tab.classList.add('active');
-
-      // コンテンツのアクティブ状態を更新
-      DOM.tabContents.querySelectorAll('.venue-tab-content').forEach(c => c.classList.remove('active'));
-      const content = DOM.tabContents.querySelector(`.venue-tab-content[data-venue="${venueId}"]`);
-      if (content) content.classList.add('active');
+    // タブのアクティブ状態・ARIA属性を更新
+    DOM.venueTabs.querySelectorAll('.venue-tab').forEach(t => {
+      t.classList.remove('active');
+      t.setAttribute('aria-selected', 'false');
+      t.setAttribute('tabindex', '-1');
     });
+    tab.classList.add('active');
+    tab.setAttribute('aria-selected', 'true');
+    tab.setAttribute('tabindex', '0');
+
+    // コンテンツのアクティブ状態を更新
+    DOM.tabContents.querySelectorAll('.venue-tab-content').forEach(c => {
+      c.classList.remove('active');
+      c.setAttribute('hidden', '');
+    });
+    const content = DOM.tabContents.querySelector(`.venue-tab-content[data-venue="${venueId}"]`);
+    if (content) {
+      content.classList.add('active');
+      content.removeAttribute('hidden');
+    }
+  }
+
+  // タブ切り替えイベント（クリック）
+  DOM.venueTabs.querySelectorAll('.venue-tab').forEach(tab => {
+    tab.addEventListener('click', () => switchTab(tab));
+  });
+
+  // タブキーボード操作（矢印キーで移動）
+  DOM.venueTabs.addEventListener('keydown', (e) => {
+    const tabs = [...DOM.venueTabs.querySelectorAll('.venue-tab')];
+    const currentIndex = tabs.indexOf(e.target);
+    if (currentIndex === -1) return;
+
+    let newIndex;
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+      e.preventDefault();
+      newIndex = (currentIndex + 1) % tabs.length;
+    } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+      e.preventDefault();
+      newIndex = (currentIndex - 1 + tabs.length) % tabs.length;
+    } else if (e.key === 'Home') {
+      e.preventDefault();
+      newIndex = 0;
+    } else if (e.key === 'End') {
+      e.preventDefault();
+      newIndex = tabs.length - 1;
+    } else {
+      return;
+    }
+
+    tabs[newIndex].focus();
+    switchTab(tabs[newIndex]);
   });
 }
 
@@ -375,13 +452,13 @@ function renderTabSession(session, basePath) {
               const affiliation = speakerData?.affiliation || '';
 
               return `
-                <a href="javascript:void(0)" class="speaker-item" data-speaker-name="${escapeHtml(speaker.name)}">
-                  <img src="${photoSrc}" alt="${escapeHtml(speaker.name)}" loading="lazy" onerror="this.src='${basePath}images/speakers/default.svg'">
+                <button type="button" class="speaker-item" data-speaker-name="${escapeHtml(speaker.name)}">
+                  <img src="${photoSrc}" alt="${escapeHtml(speaker.name)}" loading="lazy">
                   <div class="speaker-item-info">
                     <h5>${escapeHtml(speaker.name)}</h5>
                     ${affiliation ? `<p class="affiliation">${escapeHtml(affiliation)}</p>` : ''}
                   </div>
-                </a>
+                </button>
               `;
             }).join('')}
           </div>
@@ -431,122 +508,6 @@ function filterTabSessions() {
       tab.textContent = `(${venueSessions.length})`;
     }
   });
-}
-
-/**
- * フィルターオプションを生成
- */
-function populateFilterOptions() {
-  if (DOM.venueFilter) {
-    appData.venues.forEach(venue => {
-      const option = document.createElement('option');
-      option.value = venue.id;
-      option.textContent = venue.name;
-      DOM.venueFilter.appendChild(option);
-    });
-  }
-
-  if (DOM.timeFilter) {
-    appData.timeSlots.forEach(slot => {
-      const option = document.createElement('option');
-      option.value = slot.id;
-      option.textContent = slot.name;
-      DOM.timeFilter.appendChild(option);
-    });
-  }
-}
-
-/**
- * セッションをフィルタリング
- */
-function filterSessions() {
-  const searchTerm = DOM.searchInput?.value.toLowerCase() || '';
-  const venueFilter = DOM.venueFilter?.value || '';
-  const timeFilter = DOM.timeFilter?.value || '';
-
-  const filtered = appData.sessions.filter(session => {
-    // 検索条件
-    const matchesSearch = !searchTerm ||
-      session.title.toLowerCase().includes(searchTerm) ||
-      session.description.toLowerCase().includes(searchTerm) ||
-      session.speakers.some(s => s.name.toLowerCase().includes(searchTerm) ||
-        (s.nameKana && s.nameKana.toLowerCase().includes(searchTerm)));
-
-    // 会場フィルター
-    const matchesVenue = !venueFilter || session.venue === venueFilter;
-
-    // 時間帯フィルター
-    const matchesTime = !timeFilter || session.timeSlot === timeFilter;
-
-    return matchesSearch && matchesVenue && matchesTime;
-  });
-
-  renderSessions(filtered);
-}
-
-/**
- * セッションをレンダリング
- */
-function renderSessions(sessions) {
-  if (!DOM.sessionsGrid) return;
-
-  if (sessions.length === 0) {
-    DOM.sessionsGrid.innerHTML = `
-      <div class="no-results">
-        <h3>該当するセッションが見つかりませんでした</h3>
-        <p>検索条件を変更してお試しください</p>
-      </div>
-    `;
-    return;
-  }
-
-  DOM.sessionsGrid.innerHTML = sessions.map(session => createSessionCard(session)).join('');
-
-  // モーダル用のイベントリスナー
-  DOM.sessionsGrid.querySelectorAll('.session-card').forEach(card => {
-    card.addEventListener('click', (e) => {
-      if (!e.target.closest('a')) {
-        const sessionId = card.dataset.sessionId;
-        const session = appData.sessions.find(s => s.id === sessionId);
-        if (session) showSessionModal(session);
-      }
-    });
-  });
-}
-
-/**
- * セッションカードを生成
- */
-function createSessionCard(session) {
-  const timeSlot = appData.timeSlots.find(t => t.id === session.timeSlot);
-  const basePath = getBasePath();
-
-  return `
-    <article class="session-card" data-session-id="${session.id}">
-      <div class="session-card-header">
-        <span class="venue-badge">${session.venueCode}</span>
-        <span class="time-slot">${timeSlot ? timeSlot.name : ''}</span>
-      </div>
-      <div class="session-card-body">
-        <h3><a href="#" onclick="event.preventDefault();">${escapeHtml(session.title)}</a></h3>
-        <p class="session-description">${escapeHtml(session.description)}</p>
-        <div class="session-speakers">
-          ${session.speakers.map(speaker => {
-            const speakerData = appData.speakers.find(s =>
-              s.name.replace(/\s/g, '') === speaker.name.replace(/\s/g, '')
-            );
-            const photoSrc = speakerData ? `${basePath}${speakerData.photo}` : `${basePath}images/speakers/default.svg`;
-            return `
-              <a href="javascript:void(0)" class="speaker-tag" data-speaker-name="${escapeHtml(speaker.name)}">
-                <img src="${photoSrc}" alt="${escapeHtml(speaker.name)}" loading="lazy" onerror="this.src='${basePath}images/speakers/default.svg'">
-                ${escapeHtml(speaker.name)}
-              </a>
-            `;
-          }).join('')}
-        </div>
-      </div>
-    </article>
-  `;
 }
 
 /* ========================================
@@ -603,7 +564,7 @@ function renderTimetable() {
       if (session) {
         return `
           <td data-venue="${venue.id}">
-            <div class="timetable-session" data-session-id="${session.id}">
+            <div class="timetable-session" data-session-id="${session.id}" role="button" tabindex="0" aria-label="セッション: ${escapeHtml(session.title)}">
               <h4>${escapeHtml(session.title)}</h4>
               <div class="speakers">${session.speakers.map(s => s.name).join('、')}</div>
             </div>
@@ -661,7 +622,7 @@ function renderTimetableMobile() {
     if (slotSessions.length === 0) return '';
 
     const sessionsHtml = slotSessions.map(({ session, venue }) => `
-      <div class="timetable-mobile-session" data-session-id="${session.id}" data-venue="${venue.id}">
+      <div class="timetable-mobile-session" data-session-id="${session.id}" data-venue="${venue.id}" role="button" tabindex="0" aria-label="セッション: ${escapeHtml(session.title)}">
         <div class="timetable-mobile-session-header">
           <span class="timetable-mobile-session-venue">${venue.nameJp || venue.id}</span>
           <span class="timetable-mobile-session-code">${session.venueCode}</span>
@@ -792,7 +753,7 @@ function renderSpeakers(speakers) {
   DOM.speakersGrid.innerHTML = speakers.map(speaker => `
     <article class="speaker-card" data-speaker-name="${escapeHtml(speaker.name)}" data-speaker-id="${speaker.id}">
       <div class="speaker-clickable">
-        <img class="speaker-photo" src="${basePath}${speaker.photo}" alt="${escapeHtml(speaker.name)}" loading="lazy" onerror="this.src='${basePath}images/speakers/default.svg'">
+        <img class="speaker-photo" src="${basePath}${speaker.photo}" alt="${escapeHtml(speaker.name)}" loading="lazy">
         <div class="speaker-info">
           <h3>${escapeHtml(speaker.name)}</h3>
           <p class="speaker-kana">${escapeHtml(speaker.nameKana || '')}</p>
@@ -897,13 +858,13 @@ function renderVenueSessions(sessions) {
               );
               const photoSrc = speakerData ? `${basePath}${speakerData.photo}` : `${basePath}images/speakers/default.svg`;
               return `
-                <a href="javascript:void(0)" class="venue-speaker" data-speaker-name="${escapeHtml(speaker.name)}">
-                  <img src="${photoSrc}" alt="${escapeHtml(speaker.name)}" loading="lazy" onerror="this.src='${basePath}images/speakers/default.svg'">
+                <button type="button" class="venue-speaker" data-speaker-name="${escapeHtml(speaker.name)}">
+                  <img src="${photoSrc}" alt="${escapeHtml(speaker.name)}" loading="lazy">
                   <div class="venue-speaker-info">
                     <h4>${escapeHtml(speaker.name)}</h4>
                     <p>${escapeHtml(speaker.nameKana || '')}</p>
                   </div>
-                </a>
+                </button>
               `;
             }).join('')}
           </div>
@@ -948,13 +909,13 @@ function showSessionModal(session) {
                 );
                 const photoSrc = speakerData ? `${basePath}${speakerData.photo}` : `${basePath}${CONFIG.DEFAULTS.SPEAKER_PHOTO}`;
                 return `
-                  <a href="javascript:void(0)" class="venue-speaker" data-speaker-name="${escapeHtml(speaker.name)}" data-close-modal="true">
-                    <img src="${photoSrc}" alt="${escapeHtml(speaker.name)}" loading="lazy" onerror="this.src='${basePath}${CONFIG.DEFAULTS.SPEAKER_PHOTO}'">
+                  <button type="button" class="venue-speaker" data-speaker-name="${escapeHtml(speaker.name)}" data-close-modal="true">
+                    <img src="${photoSrc}" alt="${escapeHtml(speaker.name)}" loading="lazy">
                     <div class="venue-speaker-info">
                       <h4>${escapeHtml(speaker.name)}</h4>
                       <p>${escapeHtml(speaker.nameKana || '')}</p>
                     </div>
-                  </a>
+                  </button>
                 `;
               }).join('')}
             </div>
@@ -983,7 +944,7 @@ function showSpeakerModal(speaker) {
           <div style="text-align: center; margin-bottom: 1rem;">
             <img src="${basePath}${speaker.photo}" alt="${escapeHtml(speaker.name)}"
                  style="width: 150px; height: 150px; border-radius: 50%; object-fit: cover;"
-                 onerror="this.src='${basePath}${CONFIG.DEFAULTS.SPEAKER_PHOTO}'">
+>
           </div>
           <div class="modal-section">
             <h4>所属・役職</h4>
@@ -1083,6 +1044,17 @@ document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape') closeModal();
 });
 
+// Enter/Spaceキーで role="button" 要素をクリック発火
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter' || e.key === ' ') {
+    const target = e.target;
+    if (target.getAttribute('role') === 'button' && target.matches('.timetable-session, .timetable-mobile-session')) {
+      e.preventDefault();
+      target.click();
+    }
+  }
+});
+
 // イベント委譲パターン
 document.body.addEventListener('click', (e) => {
   // 登壇者モーダル表示
@@ -1121,26 +1093,10 @@ document.body.addEventListener('click', (e) => {
 });
 
 /* ========================================
-   ユーティリティ関数
+   ユーティリティ関数（Utils オブジェクトへの委譲）
 ======================================== */
-function escapeHtml(text) {
-  if (!text) return '';
-  const div = document.createElement('div');
-  div.textContent = text;
-  return div.innerHTML;
-}
-
-function debounce(func, wait) {
-  let timeout;
-  return function executedFunction(...args) {
-    const later = () => {
-      clearTimeout(timeout);
-      func(...args);
-    };
-    clearTimeout(timeout);
-    timeout = setTimeout(later, wait);
-  };
-}
+const escapeHtml = Utils.escapeHtml.bind(Utils);
+const debounce = Utils.debounce.bind(Utils);
 
 function showError(message) {
   const errorDiv = document.createElement('div');
@@ -1164,7 +1120,7 @@ function showSpeakerModalByName(speakerName) {
 
 // 名前空間パターンでグローバルに公開
 const Michishirube = {
-  data: appData,
+  get data() { return appData; },
   config: CONFIG,
   utils: Utils,
   modal: Modal,
