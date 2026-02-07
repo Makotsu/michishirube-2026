@@ -729,16 +729,16 @@ function renderTimetableMobile() {
         <div class="timetable-mobile-session-header">
           <span class="timetable-mobile-session-venue">${venue.nameJp || venue.id}</span>
           <span class="timetable-mobile-session-code">${session.venueCode}</span>
+          <button type="button" class="favorite-btn favorite-btn-compact ${isFavMobile ? 'is-favorited' : ''}"
+                  data-session-id="${session.id}"
+                  aria-pressed="${isFavMobile}"
+                  aria-label="${isFavMobile ? 'お気に入りから削除' : 'お気に入りに追加'}">
+            <span class="favorite-btn-icon" aria-hidden="true">${isFavMobile ? '\u2605' : '\u2606'}</span>
+            <span class="favorite-btn-text sr-only">${isFavMobile ? '\u8ffd\u52a0\u6e08\u307f' : '\u6c17\u306b\u306a\u308b'}</span>
+          </button>
         </div>
         <h4>${escapeHtml(session.title)}</h4>
         <div class="speakers">${session.speakers.map(s => s.name).join('、')}</div>
-        <button type="button" class="favorite-btn favorite-btn-compact ${isFavMobile ? 'is-favorited' : ''}"
-                data-session-id="${session.id}"
-                aria-pressed="${isFavMobile}"
-                aria-label="${isFavMobile ? 'お気に入りから削除' : 'お気に入りに追加'}">
-          <span class="favorite-btn-icon" aria-hidden="true">${isFavMobile ? '\u2605' : '\u2606'}</span>
-          <span class="favorite-btn-text sr-only">${isFavMobile ? '\u8ffd\u52a0\u6e08\u307f' : '\u6c17\u306b\u306a\u308b'}</span>
-        </button>
       </div>
     `;
     }).join('');

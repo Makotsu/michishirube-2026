@@ -2088,7 +2088,6 @@ select:focus-visible {
     border: 1px solid var(--color-border);
     border-top: none;
     padding: var(--space-m);
-    padding-right: calc(var(--space-m) + 44px);
     cursor: pointer;
     transition: var(--ease-default);
   }
@@ -2389,8 +2388,9 @@ html.font-size-large {
 
 @media (max-width: 767px) {
   .timetable-mobile-session .favorite-btn-compact {
-    top: var(--space-m);
-    right: var(--space-m);
+    position: static;
+    margin-left: auto;
+    flex-shrink: 0;
   }
 }
 
