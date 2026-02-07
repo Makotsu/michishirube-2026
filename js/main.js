@@ -727,8 +727,7 @@ function renderTimetableMobile() {
       return `
       <div class="timetable-mobile-session" data-session-id="${session.id}" data-venue="${venue.id}" role="button" tabindex="0" aria-label="セッション: ${escapeHtml(session.title)}">
         <div class="timetable-mobile-session-header">
-          <span class="timetable-mobile-session-venue">${venue.nameJp || venue.id}</span>
-          <span class="timetable-mobile-session-code">${session.venueCode}</span>
+          <span class="timetable-mobile-session-venue">${session.venueCode}</span>
           <button type="button" class="favorite-btn favorite-btn-compact ${isFavMobile ? 'is-favorited' : ''}"
                   data-session-id="${session.id}"
                   aria-pressed="${isFavMobile}"
