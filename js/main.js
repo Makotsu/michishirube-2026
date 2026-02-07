@@ -559,6 +559,8 @@ function renderTimetableHeader() {
 function renderTimetable() {
   if (!DOM.timetableBody) return;
 
+  const venueCount = appData.venues.length;
+
   // 時間帯を正しい順序でソート
   const sortedTimeSlots = [...appData.timeSlots].sort((a, b) => {
     return CONFIG.TIME_SLOT_ORDER.indexOf(a.id) - CONFIG.TIME_SLOT_ORDER.indexOf(b.id);
@@ -566,6 +568,44 @@ function renderTimetable() {
 
   // 時間帯ごとの行を生成
   const rows = sortedTimeSlots.map(slot => {
+    const timeLabel = slot.label ? `<small>${slot.label}</small>` : '';
+
+    // 全体セッション（オープニング・クロージング等）の場合
+    if (slot.isPlenary) {
+      const plenarySession = appData.plenarySessions
+        ? appData.plenarySessions.find(p => p.timeSlot === slot.id)
+        : null;
+
+      const programsHtml = plenarySession
+        ? plenarySession.programs
+            .map(p => `<span>${escapeHtml(p)}</span>`)
+            .join('<span class="timetable-plenary-sep" aria-hidden="true">／</span>')
+        : '';
+
+      const plenaryContent = plenarySession
+        ? `<div class="timetable-plenary">
+            <div class="timetable-plenary-title">${escapeHtml(plenarySession.title)}</div>
+            <div class="timetable-plenary-meta">${escapeHtml(plenarySession.location)}</div>
+            <div class="timetable-plenary-programs">${programsHtml}</div>
+          </div>`
+        : '';
+
+      return `
+        <tr data-timeslot="${slot.id}" class="timetable-plenary-row">
+          <th>
+            <div class="timetable-time">
+              <span class="time">${slot.name}</span>
+              ${timeLabel}
+            </div>
+          </th>
+          <td colspan="${venueCount}" class="timetable-plenary-cell">
+            ${plenaryContent}
+          </td>
+        </tr>
+      `;
+    }
+
+    // 通常の選択セッション
     const cells = appData.venues.map(venue => {
       const session = appData.sessions.find(s =>
         s.venue === venue.id && s.timeSlot === slot.id
@@ -585,7 +625,6 @@ function renderTimetable() {
       }
     }).join('');
 
-    const timeLabel = slot.label ? `<small>${slot.label}</small>` : '';
     return `
       <tr data-timeslot="${slot.id}">
         <th>
@@ -619,7 +658,38 @@ function renderTimetableMobile() {
 
   // 時間帯ごとにセッションをグループ化
   const slotsHtml = sortedTimeSlots.map(slot => {
-    // この時間帯のセッションを取得（会場順）
+    const timeLabel = slot.label ? `<small>${slot.label}</small>` : '';
+
+    // 全体セッション（オープニング・クロージング等）の場合
+    if (slot.isPlenary) {
+      const plenarySession = appData.plenarySessions
+        ? appData.plenarySessions.find(p => p.timeSlot === slot.id)
+        : null;
+
+      if (!plenarySession) return '';
+
+      const mobileProgramsHtml = plenarySession.programs
+        .map(p => `<span>${escapeHtml(p)}</span>`)
+        .join('<span class="timetable-plenary-sep" aria-hidden="true">／</span>');
+
+      return `
+        <div class="timetable-mobile-slot timetable-mobile-plenary" data-timeslot="${slot.id}">
+          <div class="timetable-mobile-slot-header">
+            <h3>${slot.name}</h3>
+            ${timeLabel}
+          </div>
+          <div class="timetable-mobile-sessions">
+            <div class="timetable-plenary">
+              <div class="timetable-plenary-title">${escapeHtml(plenarySession.title)}</div>
+              <div class="timetable-plenary-meta">${escapeHtml(plenarySession.location)}</div>
+              <div class="timetable-plenary-programs">${mobileProgramsHtml}</div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    // 通常の選択セッション
     const slotSessions = appData.venues
       .map(venue => {
         const session = appData.sessions.find(s =>
@@ -641,8 +711,6 @@ function renderTimetableMobile() {
         <div class="speakers">${session.speakers.map(s => s.name).join('、')}</div>
       </div>
     `).join('');
-
-    const timeLabel = slot.label ? `<small>${slot.label}</small>` : '';
 
     return `
       <div class="timetable-mobile-slot" data-timeslot="${slot.id}">

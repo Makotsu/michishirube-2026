@@ -3,7 +3,7 @@
  */
 const CONFIG = {
   // タイムスロット順序（正しい順序に統一）
-  TIME_SLOT_ORDER: ['1', '2', 'L', '3'],
+  TIME_SLOT_ORDER: ['O', '1', '2', 'L', '3', 'C'],
 
   // localStorage キー
   STORAGE_KEYS: {
