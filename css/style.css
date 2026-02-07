@@ -214,6 +214,7 @@ h6 { font-size: var(--text-base); }
 .header {
   background-color: var(--color-bg);
   color: var(--color-text);
+  position: -webkit-sticky;
   position: sticky;
   top: 0;
   z-index: 1000;
@@ -844,6 +845,7 @@ h6 { font-size: var(--text-base); }
   color: var(--color-text);
   font-weight: 400;
   text-align: center;
+  position: -webkit-sticky;
   position: sticky;
   top: 0;
   z-index: 10;
@@ -855,6 +857,7 @@ h6 { font-size: var(--text-base); }
   font-weight: 400;
   text-align: center;
   white-space: nowrap;
+  position: -webkit-sticky;
   position: sticky;
   left: 0;
   z-index: 5;
@@ -1435,6 +1438,7 @@ td[data-venue] .timetable-session { border-left-color: var(--venue-color); }
   right: 0;
   bottom: 0;
   background-color: rgba(0, 0, 0, 0.6);
+  -webkit-backdrop-filter: blur(4px);
   backdrop-filter: blur(4px);
   display: flex;
   align-items: center;
@@ -1473,6 +1477,7 @@ td[data-venue] .timetable-session { border-left-color: var(--venue-color); }
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
+  position: -webkit-sticky;
   position: sticky;
   top: 0;
   z-index: 10;

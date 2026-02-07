@@ -42,8 +42,13 @@ function initializeImageErrorHandler() {
  * フォントサイズ切り替え機能の初期化
  */
 function initializeFontSizeControls() {
-  // 保存された設定を適用
-  const savedSize = localStorage.getItem(CONFIG.STORAGE_KEYS.FONT_SIZE) || CONFIG.DEFAULTS.FONT_SIZE;
+  // 保存された設定を適用（プライベートブラウジング対応）
+  let savedSize = CONFIG.DEFAULTS.FONT_SIZE;
+  try {
+    savedSize = localStorage.getItem(CONFIG.STORAGE_KEYS.FONT_SIZE) || CONFIG.DEFAULTS.FONT_SIZE;
+  } catch (e) {
+    // プライベートブラウジングモード等でlocalStorageが使用不可の場合
+  }
   setFontSize(savedSize);
 
   // ボタンにイベントリスナーを追加
@@ -51,7 +56,11 @@ function initializeFontSizeControls() {
     btn.addEventListener('click', () => {
       const size = btn.dataset.size;
       setFontSize(size);
-      localStorage.setItem(CONFIG.STORAGE_KEYS.FONT_SIZE, size);
+      try {
+        localStorage.setItem(CONFIG.STORAGE_KEYS.FONT_SIZE, size);
+      } catch (e) {
+        // プライベートブラウジングモード等でlocalStorageが使用不可の場合
+      }
     });
   });
 }
