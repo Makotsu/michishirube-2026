@@ -441,6 +441,7 @@ function renderTabSession(session, basePath) {
       <div class="tab-session-body">
         <h3>${escapeHtml(session.title)}</h3>
         <p class="description">${escapeHtml(session.description)}</p>
+        <button type="button" class="description-toggle-btn" aria-expanded="false">詳しく読む</button>
         <div class="tab-session-speakers">
           <h4>登壇者</h4>
           <div class="speakers-list">
@@ -1057,6 +1058,19 @@ document.addEventListener('keydown', (e) => {
 
 // イベント委譲パターン
 document.body.addEventListener('click', (e) => {
+  // セッション概要の「詳しく読む」トグル
+  const toggleBtn = e.target.closest('.description-toggle-btn');
+  if (toggleBtn) {
+    const description = toggleBtn.previousElementSibling;
+    if (description && description.classList.contains('description')) {
+      const isExpanded = description.classList.toggle('expanded');
+      toggleBtn.classList.toggle('expanded', isExpanded);
+      toggleBtn.textContent = isExpanded ? '閉じる' : '詳しく読む';
+      toggleBtn.setAttribute('aria-expanded', isExpanded);
+    }
+    return;
+  }
+
   // 登壇者モーダル表示
   const speakerTrigger = e.target.closest('[data-speaker-name]');
   if (speakerTrigger) {

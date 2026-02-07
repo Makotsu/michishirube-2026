@@ -1161,6 +1161,56 @@ td[data-venue] .timetable-session { border-left-color: var(--venue-color); }
   margin-bottom: var(--space-m);
 }
 
+/* モバイル: セッション概要の省略表示 */
+.description-toggle-btn {
+  display: none;
+}
+
+@media (max-width: 767px) {
+  .tab-session-body .description {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .tab-session-body .description.expanded {
+    display: block;
+    -webkit-line-clamp: unset;
+    overflow: visible;
+  }
+
+  .description-toggle-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    background: none;
+    border: 1px solid var(--color-border);
+    color: var(--color-text-sub);
+    font-size: var(--text-sm);
+    font-family: var(--font-body);
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    transition: var(--ease-fast);
+    margin-bottom: var(--space-m);
+  }
+
+  .description-toggle-btn:hover {
+    border-color: var(--color-text);
+    color: var(--color-text);
+  }
+
+  .description-toggle-btn::after {
+    content: '▼';
+    font-size: 0.625rem;
+    transition: transform var(--ease-fast);
+  }
+
+  .description-toggle-btn.expanded::after {
+    transform: rotate(180deg);
+  }
+}
+
 .tab-session-speakers {
   border-top: 1px solid var(--color-border);
   padding-top: var(--space-m);
