@@ -1071,15 +1071,21 @@ document.addEventListener('touchmove', (e) => {
 
 // イベント委譲パターン
 document.body.addEventListener('click', (e) => {
-  // セッション概要の「詳しく読む」トグル
+  // セッション概要の「詳しく読む」トグル（ボタンまたは概要テキストクリック）
   const toggleBtn = e.target.closest('.description-toggle-btn');
-  if (toggleBtn) {
-    const description = toggleBtn.previousElementSibling;
+  const descriptionEl = e.target.closest('.tab-session-body > .description');
+  if (toggleBtn || (descriptionEl && !descriptionEl.classList.contains('expanded'))) {
+    const description = toggleBtn
+      ? toggleBtn.previousElementSibling
+      : descriptionEl;
     if (description && description.classList.contains('description')) {
       const isExpanded = description.classList.toggle('expanded');
-      toggleBtn.classList.toggle('expanded', isExpanded);
-      toggleBtn.textContent = isExpanded ? '閉じる' : '詳しく読む';
-      toggleBtn.setAttribute('aria-expanded', isExpanded);
+      const btn = description.nextElementSibling;
+      if (btn && btn.classList.contains('description-toggle-btn')) {
+        btn.classList.toggle('expanded', isExpanded);
+        btn.textContent = isExpanded ? '閉じる' : '詳しく読む';
+        btn.setAttribute('aria-expanded', isExpanded);
+      }
     }
     return;
   }

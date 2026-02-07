@@ -1174,6 +1174,10 @@ td[data-venue] .timetable-session { border-left-color: var(--venue-color); }
     overflow: hidden;
   }
 
+  .tab-session-body .description:not(.expanded) {
+    cursor: pointer;
+  }
+
   .tab-session-body .description.expanded {
     display: block;
     -webkit-line-clamp: unset;
@@ -1181,8 +1185,9 @@ td[data-venue] .timetable-session { border-left-color: var(--venue-color); }
   }
 
   .description-toggle-btn {
-    display: inline-flex;
+    display: flex;
     align-items: center;
+    justify-content: center;
     gap: 0.25rem;
     background: none;
     border: 1px solid var(--color-border);
@@ -1192,7 +1197,7 @@ td[data-venue] .timetable-session { border-left-color: var(--venue-color); }
     padding: 0.5rem 1rem;
     cursor: pointer;
     transition: var(--ease-fast);
-    margin-bottom: var(--space-m);
+    margin: 0 auto var(--space-m);
   }
 
   .description-toggle-btn:hover {
