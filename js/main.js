@@ -1354,7 +1354,7 @@ document.body.addEventListener('click', (e) => {
   }
 
   // セッションモーダル表示（タイムテーブル - PC/モバイル両対応）
-  const sessionTrigger = e.target.closest('.timetable-session[data-session-id], .timetable-mobile-session[data-session-id]');
+  const sessionTrigger = e.target.closest('.timetable-session[data-session-id], .timetable-mobile-session[data-session-id], .schedule-session[data-session-id]');
   if (sessionTrigger) {
     const sessionId = sessionTrigger.dataset.sessionId;
     const session = appData.sessions.find(s => s.id === sessionId);
@@ -1495,7 +1495,7 @@ function renderSchedule(container) {
       const venue = appData.venues.find(v => v.id === session.venue);
       const isFav = Favorites.isFavorited(session.id);
       return `
-        <div class="schedule-session" data-venue="${session.venue}">
+        <div class="schedule-session" data-venue="${session.venue}" data-session-id="${session.id}">
           <div class="schedule-session-header">
             <span class="schedule-session-venue">${venue ? venue.nameJp || venue.id : session.venue}</span>
             <span class="schedule-session-code">${session.venueCode}</span>
