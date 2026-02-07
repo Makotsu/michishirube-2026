@@ -1215,14 +1215,6 @@ const Favorites = {
     return false;
   },
 
-  toUrl() {
-    const ids = this.getAll();
-    if (ids.length === 0) return '';
-    const basePath = getBasePath();
-    const scheduleUrl = CONFIG.getPageUrl(basePath, 'schedule');
-    return `${window.location.origin}${window.location.pathname.replace(/[^/]*$/, '')}${scheduleUrl}?s=${ids.join(',')}`;
-  },
-
   getConflicts() {
     const ids = this.getAll();
     const bySlot = {};
@@ -1409,23 +1401,19 @@ function initializeSchedulePage() {
   const favorites = Favorites.getAll();
   const emptyEl = document.getElementById('schedule-empty');
   const contentEl = document.getElementById('schedule-content');
-  const actionsEl = document.getElementById('schedule-actions');
   const conflictsEl = document.getElementById('schedule-conflicts');
 
   if (favorites.length === 0) {
     if (emptyEl) emptyEl.hidden = false;
     if (contentEl) contentEl.hidden = true;
-    if (actionsEl) actionsEl.hidden = true;
     return;
   }
 
   if (emptyEl) emptyEl.hidden = true;
   if (contentEl) contentEl.hidden = false;
-  if (actionsEl) actionsEl.hidden = false;
 
   renderSchedule(contentEl);
   renderConflicts(conflictsEl);
-  initializeShareButtons();
 }
 
 function renderSchedule(container) {
@@ -1554,49 +1542,6 @@ function renderConflicts(container) {
       <p>${slotNames.join('\u3001')}\u306e\u6642\u9593\u5e2f\u3067\u8907\u6570\u306e\u30bb\u30c3\u30b7\u30e7\u30f3\u304c\u9078\u629e\u3055\u308c\u3066\u3044\u307e\u3059\u3002</p>
     </div>
   `;
-}
-
-function initializeShareButtons() {
-  const copyBtn = document.getElementById('share-copy');
-  const lineBtn = document.getElementById('share-line');
-  const printBtn = document.getElementById('share-print');
-
-  if (copyBtn) {
-    copyBtn.addEventListener('click', async () => {
-      const url = Favorites.toUrl();
-      if (!url) return;
-      try {
-        await navigator.clipboard.writeText(url);
-        copyBtn.textContent = '\u30b3\u30d4\u30fc\u3057\u307e\u3057\u305f\uff01';
-        setTimeout(() => { copyBtn.textContent = 'URL\u3092\u30b3\u30d4\u30fc'; }, 2000);
-      } catch (e) {
-        const textArea = document.createElement('textarea');
-        textArea.value = url;
-        textArea.style.position = 'fixed';
-        textArea.style.opacity = '0';
-        document.body.appendChild(textArea);
-        textArea.select();
-        document.execCommand('copy');
-        document.body.removeChild(textArea);
-        copyBtn.textContent = '\u30b3\u30d4\u30fc\u3057\u307e\u3057\u305f\uff01';
-        setTimeout(() => { copyBtn.textContent = 'URL\u3092\u30b3\u30d4\u30fc'; }, 2000);
-      }
-    });
-  }
-
-  if (lineBtn) {
-    lineBtn.addEventListener('click', () => {
-      const url = Favorites.toUrl();
-      if (!url) return;
-      window.open(`https://social-plugins.line.me/lineit/share?url=${encodeURIComponent(url)}`, '_blank');
-    });
-  }
-
-  if (printBtn) {
-    printBtn.addEventListener('click', () => {
-      window.print();
-    });
-  }
 }
 
 // 名前空間パターンでグローバルに公開
