@@ -2088,6 +2088,7 @@ select:focus-visible {
     border: 1px solid var(--color-border);
     border-top: none;
     padding: var(--space-m);
+    padding-right: calc(var(--space-m) + 44px);
     cursor: pointer;
     transition: var(--ease-default);
   }
