@@ -25,6 +25,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   initializeBackToTop();
   initializeScrollAnimations();
   initializePage();
+  Favorites._updateBadge();
 });
 
 /**
@@ -230,6 +231,9 @@ function initializePage() {
       break;
     case 'venue':
       initializeVenuePage();
+      break;
+    case 'schedule':
+      initializeSchedulePage();
       break;
   }
 }
@@ -474,6 +478,15 @@ function renderTabSession(session, basePath) {
           </div>
         </div>
       </div>
+      <div class="tab-session-footer">
+        <button type="button" class="favorite-btn ${Favorites.isFavorited(session.id) ? 'is-favorited' : ''}"
+                data-session-id="${session.id}"
+                aria-pressed="${Favorites.isFavorited(session.id)}"
+                aria-label="${Favorites.isFavorited(session.id) ? 'お気に入りから削除: ' : 'お気に入りに追加: '}${escapeHtml(session.title)}">
+          <span class="favorite-btn-icon" aria-hidden="true">${Favorites.isFavorited(session.id) ? '\u2605' : '\u2606'}</span>
+          <span class="favorite-btn-text">${Favorites.isFavorited(session.id) ? '\u8ffd\u52a0\u6e08\u307f' : '\u6c17\u306b\u306a\u308b'}</span>
+        </button>
+      </div>
     </article>
   `;
 }
@@ -612,9 +625,17 @@ function renderTimetable() {
       );
 
       if (session) {
+        const isFavTT = Favorites.isFavorited(session.id);
         return `
           <td data-venue="${venue.id}">
             <div class="timetable-session" data-session-id="${session.id}" role="button" tabindex="0" aria-label="セッション: ${escapeHtml(session.title)}">
+              <button type="button" class="favorite-btn favorite-btn-compact ${isFavTT ? 'is-favorited' : ''}"
+                      data-session-id="${session.id}"
+                      aria-pressed="${isFavTT}"
+                      aria-label="${isFavTT ? 'お気に入りから削除' : 'お気に入りに追加'}">
+                <span class="favorite-btn-icon" aria-hidden="true">${isFavTT ? '\u2605' : '\u2606'}</span>
+                <span class="favorite-btn-text sr-only">${isFavTT ? '\u8ffd\u52a0\u6e08\u307f' : '\u6c17\u306b\u306a\u308b'}</span>
+              </button>
               <h4>${escapeHtml(session.title)}</h4>
               <div class="speakers">${session.speakers.map(s => s.name).join('、')}</div>
             </div>
@@ -701,7 +722,9 @@ function renderTimetableMobile() {
 
     if (slotSessions.length === 0) return '';
 
-    const sessionsHtml = slotSessions.map(({ session, venue }) => `
+    const sessionsHtml = slotSessions.map(({ session, venue }) => {
+      const isFavMobile = Favorites.isFavorited(session.id);
+      return `
       <div class="timetable-mobile-session" data-session-id="${session.id}" data-venue="${venue.id}" role="button" tabindex="0" aria-label="セッション: ${escapeHtml(session.title)}">
         <div class="timetable-mobile-session-header">
           <span class="timetable-mobile-session-venue">${venue.nameJp || venue.id}</span>
@@ -709,8 +732,16 @@ function renderTimetableMobile() {
         </div>
         <h4>${escapeHtml(session.title)}</h4>
         <div class="speakers">${session.speakers.map(s => s.name).join('、')}</div>
+        <button type="button" class="favorite-btn favorite-btn-compact ${isFavMobile ? 'is-favorited' : ''}"
+                data-session-id="${session.id}"
+                aria-pressed="${isFavMobile}"
+                aria-label="${isFavMobile ? 'お気に入りから削除' : 'お気に入りに追加'}">
+          <span class="favorite-btn-icon" aria-hidden="true">${isFavMobile ? '\u2605' : '\u2606'}</span>
+          <span class="favorite-btn-text sr-only">${isFavMobile ? '\u8ffd\u52a0\u6e08\u307f' : '\u6c17\u306b\u306a\u308b'}</span>
+        </button>
       </div>
-    `).join('');
+    `;
+    }).join('');
 
     return `
       <div class="timetable-mobile-slot" data-timeslot="${slot.id}">
@@ -975,6 +1006,15 @@ function showSessionModal(session) {
             <p>${venue ? venue.name : session.venue} / ${timeSlot ? timeSlot.name : ''}</p>
           </div>
           <div class="modal-section">
+            <button type="button" class="favorite-btn favorite-btn-modal ${Favorites.isFavorited(session.id) ? 'is-favorited' : ''}"
+                    data-session-id="${session.id}"
+                    aria-pressed="${Favorites.isFavorited(session.id)}"
+                    aria-label="${Favorites.isFavorited(session.id) ? 'お気に入りから削除' : 'お気に入りに追加'}">
+              <span class="favorite-btn-icon" aria-hidden="true">${Favorites.isFavorited(session.id) ? '\u2605' : '\u2606'}</span>
+              <span class="favorite-btn-text">${Favorites.isFavorited(session.id) ? '\u6c17\u306b\u306a\u308b\u30ea\u30b9\u30c8\u306b\u8ffd\u52a0\u6e08\u307f' : '\u6c17\u306b\u306a\u308b'}</span>
+            </button>
+          </div>
+          <div class="modal-section">
             <h4>概要</h4>
             <p>${escapeHtml(session.description)}</p>
           </div>
@@ -1112,6 +1152,116 @@ const Modal = {
   }
 };
 
+// お気に入り管理オブジェクト
+const Favorites = {
+  _cache: null,
+
+  getAll() {
+    if (this._cache) return this._cache;
+    try {
+      const stored = localStorage.getItem(CONFIG.STORAGE_KEYS.FAVORITES);
+      this._cache = stored ? JSON.parse(stored) : [];
+    } catch (e) {
+      this._cache = [];
+    }
+    return this._cache;
+  },
+
+  _save(ids) {
+    this._cache = ids;
+    try {
+      localStorage.setItem(CONFIG.STORAGE_KEYS.FAVORITES, JSON.stringify(ids));
+    } catch (e) { /* Private Browsing */ }
+  },
+
+  toggle(sessionId) {
+    const ids = this.getAll();
+    const index = ids.indexOf(sessionId);
+    const added = index === -1;
+    if (added) {
+      ids.push(sessionId);
+    } else {
+      ids.splice(index, 1);
+    }
+    this._save(ids);
+    this._updateAllButtons(sessionId);
+    this._updateBadge();
+
+    // GA4イベント送信
+    if (typeof gtag === 'function') {
+      const session = appData.sessions.find(s => s.id === sessionId);
+      gtag('event', added ? 'favorite_add' : 'favorite_remove', {
+        session_id: sessionId,
+        session_title: session ? session.title : '',
+        venue: session ? session.venue : ''
+      });
+    }
+
+    return added;
+  },
+
+  isFavorited(sessionId) {
+    return this.getAll().includes(sessionId);
+  },
+
+  importFromUrl() {
+    const params = new URLSearchParams(window.location.search);
+    const sessionParam = params.get('s');
+    if (!sessionParam) return false;
+    const ids = sessionParam.split(',').filter(id => id.length >= 2);
+    if (ids.length > 0) {
+      this._save(ids);
+      return true;
+    }
+    return false;
+  },
+
+  toUrl() {
+    const ids = this.getAll();
+    if (ids.length === 0) return '';
+    const basePath = getBasePath();
+    const scheduleUrl = CONFIG.getPageUrl(basePath, 'schedule');
+    return `${window.location.origin}${window.location.pathname.replace(/[^/]*$/, '')}${scheduleUrl}?s=${ids.join(',')}`;
+  },
+
+  getConflicts() {
+    const ids = this.getAll();
+    const bySlot = {};
+    ids.forEach(id => {
+      const session = appData.sessions.find(s => s.id === id);
+      if (session) {
+        if (!bySlot[session.timeSlot]) bySlot[session.timeSlot] = [];
+        bySlot[session.timeSlot].push(session);
+      }
+    });
+    const conflicts = {};
+    Object.entries(bySlot).forEach(([slot, sessions]) => {
+      if (sessions.length > 1) conflicts[slot] = sessions;
+    });
+    return conflicts;
+  },
+
+  _updateAllButtons(sessionId) {
+    const isFav = this.isFavorited(sessionId);
+    document.querySelectorAll(`.favorite-btn[data-session-id="${sessionId}"]`).forEach(btn => {
+      btn.classList.toggle('is-favorited', isFav);
+      btn.setAttribute('aria-pressed', String(isFav));
+      const icon = btn.querySelector('.favorite-btn-icon');
+      const text = btn.querySelector('.favorite-btn-text');
+      if (icon) icon.textContent = isFav ? '\u2605' : '\u2606';
+      if (text) text.textContent = isFav ? '\u8ffd\u52a0\u6e08\u307f' : '\u6c17\u306b\u306a\u308b';
+    });
+  },
+
+  _updateBadge() {
+    const count = this.getAll().length;
+    document.querySelectorAll('.favorites-badge').forEach(badge => {
+      badge.textContent = count;
+      badge.hidden = count === 0;
+    });
+  }
+};
+
 function closeModal(event) {
   if (event && event.target !== event.currentTarget) return;
   Modal.close();
@@ -1148,6 +1298,16 @@ document.addEventListener('touchmove', (e) => {
 
 // イベント委譲パターン
 document.body.addEventListener('click', (e) => {
+  // お気に入りボタンのトグル
+  const favoriteBtn = e.target.closest('.favorite-btn');
+  if (favoriteBtn) {
+    e.preventDefault();
+    e.stopPropagation();
+    const sessionId = favoriteBtn.dataset.sessionId;
+    Favorites.toggle(sessionId);
+    return;
+  }
+
   // セッション概要の「詳しく読む」トグル（ボタンまたは概要テキストクリック）
   const toggleBtn = e.target.closest('.description-toggle-btn');
   const descriptionEl = e.target.closest('.tab-session-body > .description');
@@ -1241,12 +1401,212 @@ function showSpeakerModalByName(speakerName) {
   }
 }
 
+/* ========================================
+   マイスケジュールページ
+======================================== */
+function initializeSchedulePage() {
+  Favorites.importFromUrl();
+
+  const favorites = Favorites.getAll();
+  const emptyEl = document.getElementById('schedule-empty');
+  const contentEl = document.getElementById('schedule-content');
+  const actionsEl = document.getElementById('schedule-actions');
+  const conflictsEl = document.getElementById('schedule-conflicts');
+
+  if (favorites.length === 0) {
+    if (emptyEl) emptyEl.hidden = false;
+    if (contentEl) contentEl.hidden = true;
+    if (actionsEl) actionsEl.hidden = true;
+    return;
+  }
+
+  if (emptyEl) emptyEl.hidden = true;
+  if (contentEl) contentEl.hidden = false;
+  if (actionsEl) actionsEl.hidden = false;
+
+  renderSchedule(contentEl);
+  renderConflicts(conflictsEl);
+  initializeShareButtons();
+}
+
+function renderSchedule(container) {
+  if (!container) return;
+
+  const basePath = getBasePath();
+  const favorites = Favorites.getAll();
+
+  const sortedTimeSlots = [...appData.timeSlots].sort((a, b) => {
+    return CONFIG.TIME_SLOT_ORDER.indexOf(a.id) - CONFIG.TIME_SLOT_ORDER.indexOf(b.id);
+  });
+
+  const conflicts = Favorites.getConflicts();
+
+  const slotsHtml = sortedTimeSlots.map(slot => {
+    const isPlenary = CONFIG.PLENARY_SLOTS.includes(slot.id);
+
+    if (isPlenary) {
+      const plenarySession = appData.plenarySessions
+        ? appData.plenarySessions.find(p => p.timeSlot === slot.id)
+        : null;
+
+      if (!plenarySession) return '';
+
+      const programsHtml = plenarySession.programs
+        .map(p => `<span>${escapeHtml(p)}</span>`)
+        .join('<span class="timetable-plenary-sep" aria-hidden="true">\uff0f</span>');
+
+      return `
+        <div class="schedule-slot schedule-slot-plenary">
+          <div class="schedule-slot-header">
+            <h3>${slot.name}</h3>
+            ${slot.label ? `<small>${slot.label}</small>` : ''}
+          </div>
+          <div class="schedule-slot-body">
+            <div class="timetable-plenary">
+              <div class="timetable-plenary-title">${escapeHtml(plenarySession.title)}</div>
+              <div class="timetable-plenary-meta">${escapeHtml(plenarySession.location)}</div>
+              <div class="timetable-plenary-programs">${programsHtml}</div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    const selectedSessions = appData.sessions.filter(s =>
+      s.timeSlot === slot.id && favorites.includes(s.id)
+    );
+    const hasConflict = conflicts[slot.id];
+
+    if (selectedSessions.length === 0) {
+      return `
+        <div class="schedule-slot schedule-slot-empty">
+          <div class="schedule-slot-header">
+            <h3>${slot.name}</h3>
+            ${slot.label ? `<small>${slot.label}</small>` : ''}
+          </div>
+          <div class="schedule-slot-body">
+            <p class="schedule-unselected">\u3053\u306e\u6642\u9593\u5e2f\u306e\u30bb\u30c3\u30b7\u30e7\u30f3\u306f\u672a\u9078\u629e\u3067\u3059</p>
+          </div>
+        </div>
+      `;
+    }
+
+    const sessionsHtml = selectedSessions.map(session => {
+      const venue = appData.venues.find(v => v.id === session.venue);
+      const isFav = Favorites.isFavorited(session.id);
+      return `
+        <div class="schedule-session" data-venue="${session.venue}">
+          <div class="schedule-session-header">
+            <span class="schedule-session-venue">${venue ? venue.nameJp || venue.id : session.venue}</span>
+            <span class="schedule-session-code">${session.venueCode}</span>
+            <button type="button" class="favorite-btn favorite-btn-compact is-favorited"
+                    data-session-id="${session.id}"
+                    aria-pressed="true"
+                    aria-label="\u304a\u6c17\u306b\u5165\u308a\u304b\u3089\u524a\u9664">
+              <span class="favorite-btn-icon" aria-hidden="true">\u2605</span>
+              <span class="favorite-btn-text sr-only">\u8ffd\u52a0\u6e08\u307f</span>
+            </button>
+          </div>
+          <h4>${escapeHtml(session.title)}</h4>
+          <div class="schedule-session-meta">
+            ${venue ? `${venue.location || ''} / ` : ''}${session.speakers.map(s => s.name).join('\u3001')}
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    return `
+      <div class="schedule-slot ${hasConflict ? 'schedule-slot-conflict' : ''}">
+        <div class="schedule-slot-header">
+          <h3>${slot.name}</h3>
+          ${slot.label ? `<small>${slot.label}</small>` : ''}
+          ${hasConflict ? '<span class="schedule-conflict-badge">\u6642\u9593\u304c\u91cd\u8907\u3057\u3066\u3044\u307e\u3059</span>' : ''}
+        </div>
+        <div class="schedule-slot-body">
+          ${sessionsHtml}
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  container.innerHTML = slotsHtml;
+}
+
+function renderConflicts(container) {
+  if (!container) return;
+
+  const conflicts = Favorites.getConflicts();
+  const conflictSlots = Object.keys(conflicts);
+
+  if (conflictSlots.length === 0) {
+    container.hidden = true;
+    return;
+  }
+
+  container.hidden = false;
+  const slotNames = conflictSlots.map(slotId => {
+    const slot = appData.timeSlots.find(t => t.id === slotId);
+    return slot ? slot.name : slotId;
+  });
+
+  container.innerHTML = `
+    <div class="schedule-conflict-warning" role="alert">
+      <strong>\u26a0 \u6642\u9593\u5e2f\u306e\u91cd\u8907\u304c\u3042\u308a\u307e\u3059</strong>
+      <p>${slotNames.join('\u3001')}\u306e\u6642\u9593\u5e2f\u3067\u8907\u6570\u306e\u30bb\u30c3\u30b7\u30e7\u30f3\u304c\u9078\u629e\u3055\u308c\u3066\u3044\u307e\u3059\u3002</p>
+    </div>
+  `;
+}
+
+function initializeShareButtons() {
+  const copyBtn = document.getElementById('share-copy');
+  const lineBtn = document.getElementById('share-line');
+  const printBtn = document.getElementById('share-print');
+
+  if (copyBtn) {
+    copyBtn.addEventListener('click', async () => {
+      const url = Favorites.toUrl();
+      if (!url) return;
+      try {
+        await navigator.clipboard.writeText(url);
+        copyBtn.textContent = '\u30b3\u30d4\u30fc\u3057\u307e\u3057\u305f\uff01';
+        setTimeout(() => { copyBtn.textContent = 'URL\u3092\u30b3\u30d4\u30fc'; }, 2000);
+      } catch (e) {
+        const textArea = document.createElement('textarea');
+        textArea.value = url;
+        textArea.style.position = 'fixed';
+        textArea.style.opacity = '0';
+        document.body.appendChild(textArea);
+        textArea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textArea);
+        copyBtn.textContent = '\u30b3\u30d4\u30fc\u3057\u307e\u3057\u305f\uff01';
+        setTimeout(() => { copyBtn.textContent = 'URL\u3092\u30b3\u30d4\u30fc'; }, 2000);
+      }
+    });
+  }
+
+  if (lineBtn) {
+    lineBtn.addEventListener('click', () => {
+      const url = Favorites.toUrl();
+      if (!url) return;
+      window.open(`https://social-plugins.line.me/lineit/share?url=${encodeURIComponent(url)}`, '_blank');
+    });
+  }
+
+  if (printBtn) {
+    printBtn.addEventListener('click', () => {
+      window.print();
+    });
+  }
+}
+
 // 名前空間パターンでグローバルに公開
 const Michishirube = {
   get data() { return appData; },
   config: CONFIG,
   utils: Utils,
   modal: Modal,
+  favorites: Favorites,
   api: {
     showSessionModal: showSessionModal,
     showSpeakerModal: showSpeakerModal,

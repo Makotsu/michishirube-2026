@@ -11,20 +11,20 @@
     gtag('config', 'G-4QC66E0RH6');
   </script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="ミチシルベ2026 セッション一覧 - 集い、響きあい、踏み出す。心地よい未来へ。">
-  <title>セッション一覧 | ミチシルベ2026</title>
+  <meta name="description" content="ミチシルベ2026 マイスケジュール - 気になるセッションを時間順に確認">
+  <title>マイスケジュール | ミチシルベ2026</title>
   <!-- OGP -->
-  <meta property="og:title" content="セッション一覧 | ミチシルベ2026">
-  <meta property="og:description" content="ミチシルベ2026 セッション一覧 - 集い、響きあい、踏み出す。心地よい未来へ。">
+  <meta property="og:title" content="マイスケジュール | ミチシルベ2026">
+  <meta property="og:description" content="ミチシルベ2026 マイスケジュール - 気になるセッションを時間順に確認">
   <meta property="og:type" content="website">
-  <meta property="og:url" content="https://shiori.michishirube.okinawa/">
+  <meta property="og:url" content="https://shiori.michishirube.okinawa/schedule.html">
   <meta property="og:image" content="https://shiori.michishirube.okinawa/ogp.jpg">
   <meta property="og:image:width" content="1500">
   <meta property="og:image:height" content="1000">
   <meta property="og:site_name" content="ミチシルベ2026">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="セッション一覧 | ミチシルベ2026">
-  <meta name="twitter:description" content="ミチシルベ2026 セッション一覧 - 集い、響きあい、踏み出す。心地よい未来へ。">
+  <meta name="twitter:title" content="マイスケジュール | ミチシルベ2026">
+  <meta name="twitter:description" content="ミチシルベ2026 マイスケジュール - 気になるセッションを時間順に確認">
   <meta name="twitter:image" content="https://shiori.michishirube.okinawa/ogp.jpg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -32,7 +32,7 @@
   <link rel="stylesheet" href="css/style.css">
   <link rel="icon" type="image/png" href="faviconV2.png">
 </head>
-<body data-page="sessions">
+<body data-page="schedule">
   <a href="#main-content" class="skip-link">メインコンテンツへスキップ</a>
 
   <!-- Header -->
@@ -49,10 +49,10 @@
           <span></span>
         </button>
         <nav class="nav">
-          <a href="./" class="active">セッション</a>
+          <a href="./">セッション</a>
           <a href="timetable.html">タイムテーブル</a>
           <a href="speakers.html">登壇者</a>
-          <a href="schedule.html">マイスケジュール <span class="favorites-badge" hidden>0</span></a>
+          <a href="schedule.html" class="active">マイスケジュール <span class="favorites-badge" hidden>0</span></a>
           <a href="https://michishirube.okinawa/" target="_blank" rel="noopener">公式サイト</a>
           <div class="font-size-controls mobile">
             <span>文字</span>
@@ -76,7 +76,7 @@
     <div class="container">
       <ul class="breadcrumb-list">
         <li><a href="https://michishirube.okinawa/" target="_blank">ミチシルベ2026</a></li>
-        <li>セッション一覧</li>
+        <li>マイスケジュール</li>
       </ul>
     </div>
   </nav>
@@ -84,27 +84,39 @@
   <!-- Page Header -->
   <section class="page-header">
     <div class="container">
-      <h1>セッション一覧</h1>
-      <p>集い、響きあい、踏み出す。心地よい未来へ。</p>
+      <h1>マイスケジュール</h1>
+      <p>「気になる」に追加したセッションを時間順に確認できます</p>
     </div>
   </section>
 
   <!-- Main Content -->
   <main id="main-content" class="section">
     <div class="container">
-      <!-- Search Bar -->
-      <div class="tab-search-bar">
-        <input type="text" id="search-input" placeholder="セッション名・登壇者名で検索...">
+      <!-- 重複警告 -->
+      <div id="schedule-conflicts" hidden></div>
+
+      <!-- スケジュール内容 -->
+      <div id="schedule-content" hidden></div>
+
+      <!-- 空状態 -->
+      <div id="schedule-empty" hidden>
+        <div class="schedule-empty">
+          <div class="schedule-empty-icon" aria-hidden="true">&#9734;</div>
+          <h3>気になるセッションがまだありません</h3>
+          <p>セッション一覧やタイムテーブルから<br>「気になる」ボタンでセッションを追加してみましょう</p>
+          <a href="./" class="btn-secondary">セッション一覧を見る</a>
+        </div>
       </div>
 
-      <!-- Venue Tabs -->
-      <div class="venue-tabs">
-        <div class="venue-tabs-header" id="venue-tabs" role="tablist" aria-label="会場別セッション">
-          <!-- タブはJavaScriptで動的に生成されます -->
-          <div style="width: 100%; text-align: center; padding: 1rem;">読み込み中...</div>
-        </div>
-        <div id="tab-contents">
-          <!-- タブコンテンツはJavaScriptで動的に生成されます -->
+      <!-- 共有ボタン -->
+      <div id="schedule-actions" hidden>
+        <div class="schedule-actions">
+          <h3>スケジュールを共有・保存</h3>
+          <div class="schedule-actions-buttons">
+            <button type="button" id="share-copy" class="btn-secondary">URLをコピー</button>
+            <button type="button" id="share-line" class="btn-secondary">LINEで共有</button>
+            <button type="button" id="share-print" class="btn-secondary">印刷する</button>
+          </div>
         </div>
       </div>
     </div>
@@ -125,6 +137,7 @@
             <li><a href="./">セッション一覧</a></li>
             <li><a href="timetable">タイムテーブル</a></li>
             <li><a href="speakers">登壇者一覧</a></li>
+            <li><a href="schedule">マイスケジュール</a></li>
           </ul>
         </div>
         <div class="footer-section">

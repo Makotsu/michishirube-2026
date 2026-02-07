@@ -7,8 +7,10 @@ const CONFIG = {
 
   // localStorage キー
   STORAGE_KEYS: {
-    FONT_SIZE: 'michishirube-font-size'
+    FONT_SIZE: 'michishirube-font-size',
+    FAVORITES: 'michishirube-favorites'
   },
+  PLENARY_SLOTS: ['O', 'C'],
 
   // デフォルト値
   DEFAULTS: {

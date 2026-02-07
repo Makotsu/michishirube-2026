@@ -269,17 +269,18 @@ h6 { font-size: var(--text-base); }
 
 .nav {
   display: flex;
-  gap: var(--space-xs);
+  gap: 0.125rem;
   align-items: center;
 }
 
 .nav a {
   color: var(--color-text);
   font-size: var(--text-sm);
-  padding: 0.75rem 1.25rem;
+  padding: 0.75rem 0.75rem;
   transition: var(--ease-default);
   position: relative;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.05em;
+  white-space: nowrap;
   text-decoration: none; /* ナビには下線不要（ホバーで別途表示） */
 }
 
@@ -2188,8 +2189,8 @@ html.font-size-large {
   display: flex;
   align-items: center;
   gap: 0.25rem;
-  margin-left: var(--space-s);
-  padding-left: var(--space-s);
+  margin-left: var(--space-xs);
+  padding-left: var(--space-xs);
   border-left: 1px solid var(--color-border);
 }
 
@@ -2284,4 +2285,421 @@ html.font-size-large {
 
 .loading-container p {
   color: var(--color-text-muted);
+}
+
+/* ========================================
+   お気に入りボタン
+======================================== */
+.favorite-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.375rem;
+  min-height: 52px;
+  padding: 0.75rem 1.5rem;
+  border: 2px solid var(--color-border);
+  background-color: var(--color-bg);
+  color: var(--color-text-sub);
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  cursor: pointer;
+  transition: var(--ease-default);
+  width: 100%;
+}
+
+.favorite-btn:hover {
+  border-color: var(--color-heart);
+  color: var(--color-heart);
+}
+
+.favorite-btn.is-favorited {
+  background-color: var(--color-heart);
+  border-color: var(--color-heart);
+  color: #ffffff;
+}
+
+.favorite-btn.is-favorited:hover {
+  background-color: #d04a4a;
+  border-color: #d04a4a;
+  color: #ffffff;
+}
+
+.favorite-btn-icon {
+  font-size: 1.25em;
+  line-height: 1;
+  transition: transform var(--ease-bounce);
+}
+
+.favorite-btn.is-favorited .favorite-btn-icon {
+  transform: scale(1.2);
+}
+
+.tab-session-footer {
+  padding: 0 var(--space-m) var(--space-m);
+}
+
+/* モーダル用お気に入りボタン */
+.favorite-btn-modal {
+  width: 100%;
+}
+
+/* タイムテーブル用コンパクトボタン */
+.favorite-btn-compact {
+  width: 32px;
+  height: 32px;
+  min-height: 32px;
+  min-width: 32px;
+  padding: 0;
+  border: 1px solid transparent;
+  background-color: transparent;
+  color: var(--color-text-muted);
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  font-size: var(--text-sm);
+  z-index: 2;
+}
+
+.favorite-btn-compact:hover {
+  color: var(--color-heart);
+  border-color: transparent;
+  background-color: rgba(232, 91, 91, 0.1);
+}
+
+.favorite-btn-compact.is-favorited {
+  color: var(--color-heart);
+  background-color: transparent;
+  border-color: transparent;
+}
+
+.favorite-btn-compact.is-favorited:hover {
+  background-color: rgba(232, 91, 91, 0.1);
+  color: var(--color-heart);
+  border-color: transparent;
+}
+
+.timetable-session {
+  position: relative;
+}
+
+.timetable-mobile-session {
+  position: relative;
+}
+
+@media (max-width: 767px) {
+  .timetable-mobile-session .favorite-btn-compact {
+    top: var(--space-m);
+    right: var(--space-m);
+  }
+}
+
+@media (pointer: coarse) {
+  .favorite-btn {
+    min-height: 56px;
+  }
+
+  .favorite-btn-compact {
+    width: 40px;
+    height: 40px;
+    min-height: 40px;
+    min-width: 40px;
+  }
+}
+
+/* ========================================
+   ナビゲーションバッジ
+======================================== */
+.favorites-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: var(--radius-full);
+  background-color: var(--color-heart);
+  color: #ffffff;
+  font-size: 0.625rem;
+  font-weight: 600;
+  line-height: 1;
+  vertical-align: middle;
+  margin-left: 0.25rem;
+}
+
+.favorites-badge[hidden] {
+  display: none;
+}
+
+/* ========================================
+   マイスケジュールページ
+======================================== */
+.schedule-slot {
+  margin-bottom: var(--space-l);
+  border: 1px solid var(--color-border);
+}
+
+.schedule-slot-header {
+  background-color: var(--color-bg-alt);
+  padding: var(--space-m);
+  border-bottom: 1px solid var(--color-border);
+  display: flex;
+  align-items: center;
+  gap: var(--space-s);
+  flex-wrap: wrap;
+}
+
+.schedule-slot-header h3 {
+  font-size: var(--text-lg);
+  font-family: var(--font-heading);
+  font-weight: 400;
+  letter-spacing: 0.1em;
+}
+
+.schedule-slot-header small {
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+}
+
+.schedule-slot-body {
+  padding: var(--space-m);
+}
+
+.schedule-slot-plenary {
+  border-color: var(--color-border);
+  background-color: var(--color-bg);
+}
+
+.schedule-slot-plenary .schedule-slot-body {
+  text-align: center;
+}
+
+.schedule-slot-empty {
+  opacity: 0.5;
+}
+
+.schedule-unselected {
+  color: var(--color-text-muted);
+  font-style: italic;
+  text-align: center;
+  padding: var(--space-s) 0;
+}
+
+.schedule-slot-conflict {
+  border-color: var(--color-star);
+  border-width: 2px;
+}
+
+.schedule-conflict-badge {
+  display: inline-block;
+  background-color: var(--color-star);
+  color: #333333;
+  padding: 0.25rem 0.75rem;
+  font-size: var(--text-xs);
+  font-weight: 500;
+}
+
+.schedule-session {
+  border: 1px solid var(--color-border);
+  border-left: 3px solid var(--venue-color, var(--color-text));
+  padding: var(--space-m);
+  margin-bottom: var(--space-s);
+  position: relative;
+}
+
+.schedule-session:last-child {
+  margin-bottom: 0;
+}
+
+.schedule-session[data-venue] {
+  border-left-color: var(--venue-color);
+}
+
+.schedule-session-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-s);
+  margin-bottom: var(--space-xs);
+}
+
+.schedule-session-venue {
+  background-color: #141413;
+  color: #ffffff;
+  padding: 0.25rem 0.75rem;
+  font-size: var(--text-sm);
+  font-weight: 500;
+}
+
+[data-venue] .schedule-session-venue {
+  background-color: var(--venue-color);
+  color: var(--venue-text, #ffffff);
+}
+
+.schedule-session-code {
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+}
+
+.schedule-session h4 {
+  font-size: var(--text-base);
+  font-family: var(--font-body);
+  font-weight: 500;
+  line-height: 1.5;
+  margin-bottom: var(--space-xs);
+}
+
+.schedule-session-meta {
+  font-size: var(--text-sm);
+  color: var(--color-text-sub);
+  line-height: 1.6;
+}
+
+.schedule-session .favorite-btn-compact {
+  top: var(--space-s);
+  right: var(--space-s);
+}
+
+/* 重複警告バナー */
+.schedule-conflict-warning {
+  background-color: #fef9e7;
+  border: 2px solid var(--color-star);
+  padding: var(--space-m);
+  margin-bottom: var(--space-l);
+}
+
+.schedule-conflict-warning strong {
+  display: block;
+  margin-bottom: var(--space-xs);
+  font-size: var(--text-base);
+}
+
+.schedule-conflict-warning p {
+  font-size: var(--text-sm);
+  color: var(--color-text-sub);
+}
+
+/* 空状態 */
+.schedule-empty {
+  text-align: center;
+  padding: var(--space-xl) var(--space-m);
+}
+
+.schedule-empty-icon {
+  font-size: 3rem;
+  color: var(--color-text-muted);
+  margin-bottom: var(--space-m);
+}
+
+.schedule-empty h3 {
+  font-size: var(--text-xl);
+  font-family: var(--font-body);
+  font-weight: 500;
+  margin-bottom: var(--space-s);
+  color: var(--color-text-sub);
+}
+
+.schedule-empty p {
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+  margin-bottom: var(--space-l);
+  line-height: 2;
+}
+
+/* 共有ボタン群 */
+.schedule-actions {
+  border-top: 1px solid var(--color-border);
+  margin-top: var(--space-l);
+  padding-top: var(--space-l);
+  text-align: center;
+}
+
+.schedule-actions h3 {
+  font-size: var(--text-lg);
+  font-family: var(--font-body);
+  font-weight: 500;
+  margin-bottom: var(--space-m);
+  letter-spacing: 0.1em;
+}
+
+.schedule-actions-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-s);
+  justify-content: center;
+}
+
+.schedule-actions-buttons .btn-secondary {
+  min-width: 160px;
+}
+
+/* ========================================
+   印刷スタイル
+======================================== */
+@media print {
+  .header,
+  .footer,
+  .nav,
+  .nav-toggle,
+  .breadcrumb,
+  .back-to-top,
+  .favorite-btn,
+  .schedule-actions,
+  .font-size-controls,
+  .skip-link {
+    display: none !important;
+  }
+
+  body {
+    font-size: 12pt;
+    line-height: 1.6;
+    color: #000;
+    background: #fff;
+  }
+
+  .page-header {
+    border-bottom: 2px solid #000;
+    padding: 0.5cm 0;
+  }
+
+  .page-header::after {
+    content: "ミチシルベ2026 ─ 2026年3月8日（日）";
+    display: block;
+    font-size: 10pt;
+    color: #666;
+    margin-top: 0.25cm;
+  }
+
+  .section {
+    padding: 0.5cm 0;
+  }
+
+  .container {
+    max-width: 100%;
+    padding: 0;
+  }
+
+  .schedule-slot {
+    break-inside: avoid;
+    border: 1px solid #ccc;
+    margin-bottom: 0.5cm;
+  }
+
+  .schedule-slot-header {
+    background-color: #f0f0f0 !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .schedule-session {
+    break-inside: avoid;
+  }
+
+  .schedule-slot-empty {
+    opacity: 0.4;
+  }
+
+  .schedule-conflict-warning {
+    border: 2px solid #999;
+    background-color: #f9f9f9 !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
 }
