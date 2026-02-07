@@ -1056,6 +1056,19 @@ document.addEventListener('keydown', (e) => {
   }
 });
 
+// スクロールとタップを区別するためのタッチ追跡
+window._isScrolling = false;
+let _touchStartY = 0;
+document.addEventListener('touchstart', (e) => {
+  _touchStartY = e.touches[0].clientY;
+  window._isScrolling = false;
+}, { passive: true });
+document.addEventListener('touchmove', (e) => {
+  if (Math.abs(e.touches[0].clientY - _touchStartY) > 10) {
+    window._isScrolling = true;
+  }
+}, { passive: true });
+
 // イベント委譲パターン
 document.body.addEventListener('click', (e) => {
   // セッション概要の「詳しく読む」トグル
@@ -1069,6 +1082,19 @@ document.body.addEventListener('click', (e) => {
       toggleBtn.setAttribute('aria-expanded', isExpanded);
     }
     return;
+  }
+
+  // 展開中の概要をタップで閉じる（スクロール時は除外）
+  if (!window._isScrolling) {
+    document.querySelectorAll('.description.expanded').forEach(desc => {
+      desc.classList.remove('expanded');
+      const btn = desc.nextElementSibling;
+      if (btn && btn.classList.contains('description-toggle-btn')) {
+        btn.classList.remove('expanded');
+        btn.textContent = '詳しく読む';
+        btn.setAttribute('aria-expanded', 'false');
+      }
+    });
   }
 
   // 登壇者モーダル表示
